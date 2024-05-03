@@ -1,13 +1,11 @@
 import express from "express";
 import appRoutes from "./app.routes.js";
 import authRoutes from "./auth.routes.js";
-import paymentRoutes from "./payment.routes.js";
 
 const router = express.Router();
 
 router.use("/app", appRoutes);
 router.use("/auth", authRoutes);
-router.use("/payments", paymentRoutes);
 
 //export default
 export default router;
