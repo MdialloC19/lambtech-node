@@ -8,6 +8,11 @@ const isEmail = (value) => {
   return value.match(email);
 };
 
+const isRole = (value) => {
+  const role = ["STUDENT", "TEACHER", "ADMIN", "SUPERADMIN"];
+  return role.includes(value);
+};
+
 const isPhone = (value) => {
   const phone = /^[0-9]{12}$/;
   return value.match(phone);
@@ -35,4 +40,5 @@ export default {
   isPhone,
   hasInjection,
   isEmail,
+  isRole,
 };
