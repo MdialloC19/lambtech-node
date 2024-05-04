@@ -2,7 +2,7 @@ import { validationResult } from "express-validator";
 import User from "../../models/User.js";
 import bcrypt from "bcryptjs";
 // const config = require("config");
-// const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 const authRegisterUser = async (req, res) => {
   const errors = validationResult(req);
@@ -10,11 +10,10 @@ const authRegisterUser = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { username, email, phone, password } = req.body;
+  const { username, email, phone, password, role } = req.body;
 
   try {
     let user = await User.findOne({ email });
-    //   console.log(user);
 
     if (user) {
       return res.status(400).json({
@@ -39,25 +38,27 @@ const authRegisterUser = async (req, res) => {
 
     // Return jsonwebtoken
 
-    // const payload = {
-    //   user: {
-    //     id: user.id,
-    //   },
-    // };
+    const payload = {
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+      },
+    };
 
-    // jwt.sign(
-    //   payload,
-    //   config.get("jwtSecret"),
-    //   { expiresIn: "5 days" },
-    //   (err, token) => {
-    //     if (err) throw err;
-    //     return res.status(201).json({
-    //       token,
-    //       sucess: true,
-    //       message: "User registered",
-    //     });
-    //   }
-    // );
+    jwt.sign(
+      payload,
+      process.env.jwtSecret,
+      { expiresIn: "5 days" },
+      (err, token) => {
+        if (err) throw err;
+        return res.status(201).json({
+          token,
+          sucess: true,
+          message: "User registered",
+        });
+      }
+    );
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -67,64 +68,123 @@ const authRegisterUser = async (req, res) => {
   }
 };
 
+// const authLoginUser = async (req, res) => {
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return res.status(400).json({ errors: errors.array() });
+//   }
+
+//   const { email, password } = req.body;
+//   // console.log(email, password);
+
+//   try {
+//     let user = await User.findOne({ email });
+//     console.log(user);
+//     //see if user exists
+//     if (!user) {
+//       return res.status(400).json({
+//         errors: [{ msg: "Invalid Credentials user" }],
+//       });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, user.password);
+
+//     if (!isMatch) {
+//       return res.status(400).json({
+//         errors: [{ msg: "Invalid Credentials" }],
+//       });
+//     }
+//     // Encrypt password
+
+//     // Return jsonwebtoken
+
+//     const payload = {
+//       user: {
+//         id: user.id,
+//         username: user.username,
+//         role: user.role,
+//       },
+//     };
+
+//     jwt.sign(
+//       payload,
+//       process.env.jwtSecret,
+//       { expiresIn: "5 days" },
+//       (err, token) => {
+//         if (err) throw err;
+//         return res.status(201).json({
+//           token,
+//           sucess: true,
+//           message: "Authentificated",
+//         });
+//       }
+//     );
+//     return res.status(201).json({
+//       sucess: true,
+//       message: "Authentificated",
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({
+//       sucess: false,
+//       error: error.message,
+//     });
+//   }
+// };
+
 const authLoginUser = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { email, password } = req.body;
-  // console.log(email, password);
-
   try {
+    // Validation des champs
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email, password } = req.body;
+
+    // Vérification si l'utilisateur existe
     let user = await User.findOne({ email });
-    console.log(user);
-    //see if user exists
     if (!user) {
       return res.status(400).json({
-        errors: [{ msg: "Invalid Credentials user" }],
+        errors: [{ msg: "Invalid Credentials" }],
       });
     }
 
+    // Vérification du mot de passe
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
       return res.status(400).json({
         errors: [{ msg: "Invalid Credentials" }],
       });
     }
-    // Encrypt password
 
-    // Return jsonwebtoken
+    // Création du token JWT
+    const payload = {
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+      },
+    };
 
-    // const payload = {
-    //   user: {
-    //     id: user.id,
-    //   },
-    // };
-
-    // jwt.sign(
-    //   payload,
-    //   config.get("jwtSecret"),
-    //   { expiresIn: "5 days" },
-    //   (err, token) => {
-    //     if (err) throw err;
-    //     return res.status(201).json({
-    //       token,
-    //       sucess: true,
-    //       message: "Authentificated",
-    //     });
-    //   }
-    // );
-    return res.status(201).json({
-      sucess: true,
-      message: "Authentificated",
-    });
+    jwt.sign(
+      payload,
+      process.env.jwtSecret,
+      { expiresIn: "5 days" },
+      (err, token) => {
+        if (err) throw err;
+        res.status(201).json({
+          token,
+          success: true,
+          message: "Authenticated",
+        });
+      }
+    );
   } catch (error) {
-    console.log(error);
+    console.error(error.message);
     res.status(500).json({
-      sucess: false,
-      error: error.message,
+      success: false,
+      error: "Server Error",
     });
   }
 };
