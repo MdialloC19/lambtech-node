@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
-  name: {
+  username: {
     type: String,
     required: [true, "Please give the name"],
   },
@@ -12,12 +12,13 @@ const UserSchema = new mongoose.Schema({
     trim: true,
     // match: /^\S+@\S+\.\S+$/, // Regex for a simple email validation
   },
+  phone: {
+    type: Number,
+    required: true,
+  },
   password: {
     type: String,
     required: true,
-  },
-  avatar: {
-    type: String,
   },
   isDeleted: {
     type: Boolean,
@@ -42,4 +43,5 @@ UserSchema.pre("findOneAndUpdate", skipDeleted);
 UserSchema.pre("deleteOne", skipDeleted);
 UserSchema.pre("deleteMany", skipDeleted);
 
-export default User = mongoose.model("user", UserSchema);
+const User = mongoose.model("user", UserSchema);
+export default User;
