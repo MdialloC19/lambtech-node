@@ -34,5 +34,5 @@ StudentSchema.pre("updateMany", skipDeleted);
 StudentSchema.pre("findOneAndUpdate", skipDeleted);
 StudentSchema.pre("deleteOne", skipDeleted);
 StudentSchema.pre("deleteMany", skipDeleted);
-
-export default Student = mongoose.model("student", StudentSchema);
+const Student = mongoose.model("student", StudentSchema);
+export default Student;

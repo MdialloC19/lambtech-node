@@ -42,4 +42,5 @@ UserSchema.pre("findOneAndUpdate", skipDeleted);
 UserSchema.pre("deleteOne", skipDeleted);
 UserSchema.pre("deleteMany", skipDeleted);
 
-export default User = mongoose.model("user", UserSchema);
+const User = mongoose.model("user", UserSchema);
+export default User;
