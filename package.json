@@ -2,11 +2,9 @@
   "type": "module",
   "name": "delivery-service",
   "version": "1.0.0",
-
   "author": "LHackSRT",
   "license": "ISC",
   "description": "",
-
   "main": "app.js",
   "scripts": {
     "start": "nodemon ./src/app.js",
@@ -16,7 +14,6 @@
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
     "migrate:undo:all": "npx sequelize-cli db:migrate:undo:all"
   },
-
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
@@ -24,7 +21,9 @@
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-validator": "^7.0.1",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.3.3",
     "mysql2": "^3.9.3",
     "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
@@ -34,7 +33,6 @@
     "socket.io": "^4.7.5",
     "uuid": "^9.0.1"
   },
-
   "devDependencies": {
     "jest": "^29.7.0",
     "supertest": "^6.3.4"
