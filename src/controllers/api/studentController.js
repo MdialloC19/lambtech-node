@@ -88,7 +88,17 @@ const deleteStudent = async (req, res) => {
     if (!student) {
       return res.status(404).json({ msg: "Student not found" });
     }
-    await student.remove();
+
+    // Marquer l'étudiant comme supprimé
+    student.isDeleted = true;
+    await student.save();
+
+    // Mettre à jour isDeleted de l'utilisateur associé
+    await User.findOneAndUpdate(
+      { _id: student.user },
+      { $set: { isDeleted: true } }
+    );
+
     res.json({ msg: "Student removed" });
   } catch (err) {
     console.error(err.message);

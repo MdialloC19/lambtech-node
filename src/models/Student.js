@@ -20,6 +20,10 @@ const StudentSchema = new mongoose.Schema({
     enum: ["EXPELLED", "SUSPENDED", "AUTHORIZED"],
     default: "active",
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const skipDeleted = function () {
