@@ -1,2 +1,4 @@
+- Deleguer vers les services
+- Retirer les isDeleted users des fetch()
 - Ajouter grades enseignants
 - Documentation avec Swagger
