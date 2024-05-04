@@ -3,7 +3,8 @@ import express from "express";
 const router = express.Router();
 
 import { check } from "express-validator";
-// const usersControllers = require("../../controllers/usersControllers");
+
+// const usersControllers = require("../../controllers/usersControllers");clear
 /**
  * @desc Route to get all users.
  * @route GET api/users
