@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const TeacherSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  user: { type: mongoose.Types.ObjectId, ref: "user", required: true },
   rank: { type: String },
   hiringDate: { type: Date },
   qualification: { type: [String] },
@@ -28,5 +28,5 @@ const TeacherSchema = new mongoose.Schema({
   ],
 });
 
-const Teacher = mongoose.model("Teacher", TeacherSchema);
+const Teacher = mongoose.model("teacher", TeacherSchema);
 export default Teacher;
