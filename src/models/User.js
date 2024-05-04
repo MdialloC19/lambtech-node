@@ -12,6 +12,11 @@ const UserSchema = new mongoose.Schema({
     trim: true,
     // match: /^\S+@\S+\.\S+$/, // Regex for a simple email validation
   },
+  role: {
+    type: String,
+    enum: ["STUDENT", "TEACHER", "ADMIN", "SUPERADMIN"], // ['student', 'teacher', 'admin', 'superadmin'
+    default: "STUDENT",
+  },
   phone: {
     type: Number,
     required: true,

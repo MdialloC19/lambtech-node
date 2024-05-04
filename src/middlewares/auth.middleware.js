@@ -1,12 +1,11 @@
 import validator from "../utils/integrety.utils.js";
 
 const validateRegister = (req, res, next) => {
-  const { email, phone, username, password } = req.body;
+  const { email, phone, username, password, role } = req.body;
 
-  if ((!email && !phone) || !password || !username) {
+  if ((!email && !phone) || !password || !username || !role) {
     return res.status(400).json({
-      message:
-        "Please provide email, phone, username, country code and password",
+      message: "Please provide email, phone, username,role and password",
       data: null,
     });
   }
@@ -15,6 +14,10 @@ const validateRegister = (req, res, next) => {
   let invalid = [];
   if (email !== undefined && !validator.isEmail(email)) {
     invalid.push("invalid email");
+  }
+
+  if (role !== undefined && !validator.isRole(role)) {
+    invalid.push("invalid role");
   }
 
   if (phone && !validator.isPhone(phone)) {
