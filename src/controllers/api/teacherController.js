@@ -1,6 +1,6 @@
-import Teacher from "../models/teacher";
-import User from "../models/user";
-import integretyTester from "../../utils/integrety.utils";
+import Teacher from "../../models/teacher.js";
+import User from "../../models/User.js";
+import integretyTester from "../../utils/integrety.utils.js";
 
 // JSDoc typedefs
 /**
