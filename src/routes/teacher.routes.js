@@ -1,4 +1,4 @@
-import * as teacherController from "../controllers/api/teacherController";
+import * as teacherController from "../controllers/api/teacherController.js";
 import express from "express";
 const router = express.Router();
 
