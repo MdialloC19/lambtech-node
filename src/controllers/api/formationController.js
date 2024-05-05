@@ -1,15 +1,9 @@
 import FormationService from "../../services/api/formation.service.js";
 
-// JSDoc typedefs
-/**
- * @typedef {import('express').Request} ExpressRequest
- * @typedef {import('express').Response} ExpressResponse
- */
-
 /**
  * Get all formations.
- * @param {ExpressRequest} req - The request object.
- * @param {ExpressResponse} res - The response object.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
  * @returns {Promise<void>} - A promise that resolves with the formations.
  */
 export async function getFormations(req, res) {
@@ -17,14 +11,18 @@ export async function getFormations(req, res) {
     const formations = await FormationService.getAllFormations(req.query);
     res.json(formations);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error.statusCode) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
 
 /**
  * Create a new formation.
- * @param {ExpressRequest} req - The request object.
- * @param {ExpressResponse} res - The response object.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
  * @returns {Promise<void>} - A promise that resolves with the newly created formation.
  */
 export async function createFormation(req, res) {
@@ -32,14 +30,18 @@ export async function createFormation(req, res) {
     const newFormation = await FormationService.createFormation(req.body);
     res.status(201).json(newFormation);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error.statusCode) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
 
 /**
  * Get a formation by its ID.
- * @param {ExpressRequest} req - The request object.
- * @param {ExpressResponse} res - The response object.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
  * @returns {Promise<void>} - A promise that resolves with the formation.
  */
 export async function getFormationById(req, res) {
@@ -48,14 +50,18 @@ export async function getFormationById(req, res) {
     const formation = await FormationService.getFormationById(id);
     res.json(formation);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error.statusCode) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
 
 /**
  * Update a formation by its ID.
- * @param {ExpressRequest} req - The request object.
- * @param {ExpressResponse} res - The response object.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
  * @returns {Promise<void>} - A promise that resolves with the updated formation.
  */
 export async function updateFormation(req, res) {
@@ -67,14 +73,18 @@ export async function updateFormation(req, res) {
     );
     res.json(updatedFormation);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error.statusCode) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
 
 /**
  * Delete a formation by its ID.
- * @param {ExpressRequest} req - The request object.
- * @param {ExpressResponse} res - The response object.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
  * @returns {Promise<void>} - A promise that resolves with the result of the deletion.
  */
 export async function deleteFormation(req, res) {
@@ -83,6 +93,10 @@ export async function deleteFormation(req, res) {
     const result = await FormationService.deleteFormation(id);
     res.json(result);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error.statusCode) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
