@@ -1,8 +1,7 @@
 import Student from "../../models/Student.js";
-import User from "../../models/User.js";
-import integretyTester from "../../utils/integrety.utils.js";
 import { HttpError } from "../../utils/exceptions.js";
 import APIFeatures from "../../utils/apiFeatures.js";
+import UserService from "./user.service.js";
 
 export default class StudentService {
   /**
@@ -39,14 +38,11 @@ export default class StudentService {
    */
   static async createStudent(studentData, userData) {
     try {
-      if (!integretyTester.isEmail(userData.email)) {
-        throw new HttpError(null, 400, "Email is not valid.");
-      }
-
-      const user = await User.create(userData);
+      const user = await UserService.createUser(userData);
       const student = await Student.create({ ...studentData, user: user._id });
       return student;
     } catch (error) {
+      if (error instanceof HttpError) throw error;
       if (error.name === "ValidationError") {
         throw new HttpError(error, 400, error.message);
       } else if (error.code === 11000) {
@@ -116,7 +112,7 @@ export default class StudentService {
       }
       await student.remove();
       // Mark associated user as deleted
-      await User.findByIdAndUpdate(student.user, { isDeleted: true });
+      await UserService.deleteUser(student.user);
       return { message: "Student removed" };
     } catch (error) {
       throw new HttpError(error, 500, "Internal server error.");
