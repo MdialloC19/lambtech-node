@@ -1,4 +1,5 @@
 import UniteEnseignement from "../../models/UniteEnseignement.js";
+import APIFeatures from "../../utils/apiFeatures.js";
 
 /**
  * @route   GET /api/unitesEnseignement
@@ -7,8 +8,13 @@ import UniteEnseignement from "../../models/UniteEnseignement.js";
  */
 const getUnitesEnseignement = async (req, res) => {
   try {
-    const unitesEnseignement = await UniteEnseignement.find();
-    res.json(unitesEnseignement);
+    const features = new APIFeatures(UniteEnseignement.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const unitesEnseignements = await features.query;
+    res.json(unitesEnseignements);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");

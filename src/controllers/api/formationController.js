@@ -1,4 +1,5 @@
 import Formation from "../../models/Formation.js";
+import APIFeatures from "../../utils/apiFeatures.js";
 
 /**
  * @route   GET /api/formations
@@ -7,7 +8,12 @@ import Formation from "../../models/Formation.js";
  */
 const getFormations = async (req, res) => {
   try {
-    const formations = await Formation.find();
+    const features = new APIFeatures(Formation.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const formations = await features.query;
     res.json(formations);
   } catch (err) {
     console.error(err.message);
