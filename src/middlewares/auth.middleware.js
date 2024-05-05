@@ -20,9 +20,9 @@ const validateRegister = (req, res, next) => {
     invalid.push("invalid role");
   }
 
-  if (phone && !validator.isPhone(phone)) {
-    invalid.push("invalid phone");
-  }
+  // if (phone && !validator.isPhone(phone)) {
+  //   invalid.push("invalid phone");
+  // }
 
   // Check if  length is less than 3
   // if (username.length < 3) {

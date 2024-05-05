@@ -43,7 +43,7 @@ const UserSchema = new mongoose.Schema({
     default: "STUDENT",
   },
   phone: {
-    type: Number,
+    type: String,
     required: true,
   },
   password: {
