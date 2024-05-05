@@ -10,6 +10,7 @@ import formationRoutes from "./formation.routes.js";
 import ueRoutes from "./ue.routes.js";
 import niveauRoutes from "./niveau.routes.js";
 import matiereRoutes from "./matiere.routes.js";
+import smsRoutes from "./sms.routes.js";
 import evaluationRoutes from "./evaluation.routes.js";
 import pointageRoutes from "./pointage.routes.js";
 
@@ -28,6 +29,7 @@ router.use("/niveau", niveauRoutes);
 router.use("/matiere", matiereRoutes);
 router.use("/evaluation", evaluationRoutes);
 router.use("/pointage", pointageRoutes);
+router.use("/sms", smsRoutes);
 
 //export default
 export default router;
