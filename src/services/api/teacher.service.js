@@ -55,17 +55,17 @@ export default class TeacherService {
       throw new HttpError(null, 400, "Schedule must be a non-empty array.");
     }
 
-    if (schedule)
-      for (const slot of schedule) {
-        const { dayOfWeek, startTime, endTime } = slot;
-        if (!dayOfWeek || !startTime || !endTime) {
-          throw new HttpError(
-            null,
-            400,
-            "Schedule slot is missing required fields."
-          );
-        }
-      }
+    // if (schedule)
+    //   for (const slot of schedule) {
+    //     const { dayOfWeek, startTime, endTime } = slot;
+    //     if (!dayOfWeek || !startTime || !endTime) {
+    //       throw new HttpError(
+    //         null,
+    //         400,
+    //         "Schedule slot is missing required fields."
+    //       );
+    //     }
+    //   }
 
     return teacherData;
   }

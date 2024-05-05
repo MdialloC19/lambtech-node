@@ -1,8 +1,6 @@
-import Admin from "../../models/Admin.js";
 import User from "../../models/User.js";
 import { HttpError } from "../../utils/exceptions.js";
 import integretyTester from "../../utils/integrety.utils.js";
-import AdminService from "./admin.service.js";
 
 export default class UserService {
   /**
@@ -11,21 +9,87 @@ export default class UserService {
    * @returns {Object} - Validated user data.
    * @throws {HttpError} - Throws a custom HTTP error if validation fails.
    */
+
   static validateUserData(userData) {
-    const { username, email, password } = userData;
+    const {
+      firstname,
+      lastname,
+      dateofbirth,
+      placeofbirth,
+      nationality,
+      address,
+      sexe,
+      email,
+      password,
+      role,
+      phone,
+      isDeleted = false,
+      ...rest // Captures any additional fields not explicitly destructured
+    } = userData;
+
+    // Validated fields object
+    const validatedUserData = {};
 
     // Basic validation checks
-    if (!username || typeof username !== "string") {
+    if (!firstname || typeof firstname !== "string") {
       throw new HttpError(
         null,
         400,
-        "Username is required and must be a string."
+        "First name is required and must be a string."
       );
     }
+    validatedUserData.firstname = firstname;
+
+    if (!lastname || typeof lastname !== "string") {
+      throw new HttpError(
+        null,
+        400,
+        "Last name is required and must be a string."
+      );
+    }
+    validatedUserData.lastname = lastname;
+
+    if (!new Date(dateofbirth)) {
+      throw new HttpError(null, 400, "Invalid date of birth.");
+    }
+    validatedUserData.dateofbirth = new Date(dateofbirth);
+
+    if (!placeofbirth || typeof placeofbirth !== "string") {
+      throw new HttpError(
+        null,
+        400,
+        "Place of birth is required and must be a string."
+      );
+    }
+    validatedUserData.placeofbirth = placeofbirth;
+
+    if (!nationality || typeof nationality !== "string") {
+      throw new HttpError(
+        null,
+        400,
+        "Nationality is required and must be a string."
+      );
+    }
+    validatedUserData.nationality = nationality;
+
+    if (!address || typeof address !== "string") {
+      throw new HttpError(
+        null,
+        400,
+        "Address is required and must be a string."
+      );
+    }
+    validatedUserData.address = address;
+
+    if (!sexe || !["M", "F"].includes(sexe)) {
+      throw new HttpError(null, 400, "Sex must be 'M' or 'F'.");
+    }
+    validatedUserData.sexe = sexe;
 
     if (!integretyTester.isEmail(email)) {
       throw new HttpError(null, 400, "Invalid email format.");
     }
+    validatedUserData.email = email;
 
     if (!password || typeof password !== "string" || password.length < 6) {
       throw new HttpError(
@@ -34,8 +98,34 @@ export default class UserService {
         "Password is required and must be at least 6 characters long."
       );
     }
+    validatedUserData.password = password;
 
-    return userData;
+    if (
+      role &&
+      !["STUDENT", "TEACHER", "ADMIN", "SUPERADMIN"].includes(
+        role.toUpperCase()
+      )
+    ) {
+      throw new HttpError(null, 400, "Invalid user role.");
+    }
+
+    validatedUserData.role = role;
+
+    if (!phone || typeof phone !== "number") {
+      throw new HttpError(
+        null,
+        400,
+        "Phone number is required and must be a number."
+      );
+    }
+    validatedUserData.phone = phone;
+
+    // Check for any additional fields that were not explicitly validated
+    if (Object.keys(rest).length > 0) {
+      throw new HttpError(null, 400, "Invalid additional fields.");
+    }
+
+    return validatedUserData;
   }
 
   /**
@@ -54,6 +144,7 @@ export default class UserService {
 
       return user;
     } catch (error) {
+      console.error(error);
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "ValidationError") {
