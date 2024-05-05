@@ -14,7 +14,100 @@ Cette plateforme de gestion scolaire vise à simplifier et à automatiser les pr
 - **Tableau de Bord Administratif :** Interface pour les directeurs d'école afin de surveiller et gérer l'ensemble des activités.
 
 ## Architecture du Projet
-
+````
+.
+├── app.js
+├── controllers
+│   ├── api
+│   │   ├── adminController.js
+│   │   ├── authController.js
+│   │   ├── errorController.js
+│   │   ├── evaluationController.js
+│   │   ├── formationController.js
+│   │   ├── matiereController.js
+│   │   ├── niveauController.js
+│   │   ├── parentController.js
+│   │   ├── pointageController.js
+│   │   ├── presenceStudentController.js
+│   │   ├── presenceTeacherController.js
+│   │   ├── smsController.js
+│   │   ├── studentController.js
+│   │   ├── teacherController.js
+│   │   └── uniteEnseignementController.js
+│   └── socket
+│       ├── location.controller.js
+│       └── socket.controller.js
+├── middlewares
+│   ├── auth.middleware.js
+│   ├── device.middleware.js
+│   ├── jwt.middleware.js
+│   └── socket.middleware.js
+├── models
+│   ├── Admin.js
+│   ├── Evaluation.js
+│   ├── Formation.js
+│   ├── Matiere.js
+│   ├── Niveau.js
+│   ├── Parent.js
+│   ├── Pointage.js
+│   ├── PresenceStudent.js
+│   ├── PresenceTeacher.js
+│   ├── Sms.js
+│   ├── Student.js
+│   ├── Teacher.js
+│   ├── UniteEnseignement.js
+│   └── User.js
+├── routes
+│   ├── admin.routes.js
+│   ├── app.routes.js
+│   ├── auth.routes.js
+│   ├── evaluation.routes.js
+│   ├── formation.routes.js
+│   ├── index.routes.js
+│   ├── matiere.routes.js
+│   ├── niveau.routes.js
+│   ├── parent.routes.js
+│   ├── pointage.routes.js
+│   ├── presenceStudent.routes.js
+│   ├── presenceTeacher.routes.js
+│   ├── sms.routes.js
+│   ├── student.routes.js
+│   ├── teacher.routes.js
+│   ├── ue.routes.js
+│   └── user.routes.js
+├── services
+│   ├── api
+│   │   ├── admin.service.js
+│   │   ├── evaluation.service.js
+│   │   ├── formation.service.js
+│   │   ├── matiere.service.js
+│   │   ├── niveau.service.js
+│   │   ├── parent.service.js
+│   │   ├── pointage.service.js
+│   │   ├── smsService.js
+│   │   ├── student.service.js
+│   │   ├── teacher.service.js
+│   │   └── uniteEnseignement.service.js
+│   ├── auth
+│   │   └── auth.service.js
+│   └── socket
+│       ├── index.service.js
+│       ├── message.service.js
+│       ├── notification.service.js
+│       ├── tracking.service.js
+│       └── user.service.js
+├── utils
+│   ├── apiFeatures.js
+│   ├── common.utils.js
+│   ├── constants.js
+│   ├── exceptions.js
+│   ├── integrety.utils.js
+│   ├── mail.utils.js
+│   ├── mail2.util.js
+│   └── stringFormat.util.js
+├── .env
+└── README.md
+````
 ### Routes
 - **/auth :** Gestion de l'authentification et de l'inscription des utilisateurs.
 - **/user :** Gestion des informations des utilisateurs (CRUD).
@@ -172,98 +265,3 @@ SENDER=votre_nom_expéditeur
 npm start
 ```
 L'application sera alors exécutée grâce à nodemon, ce qui permettra de redémarrer automatiquement le serveur à chaque modification des fichiers sources.
-
-````
-.
-├── app.js
-├── controllers
-│   ├── api
-│   │   ├── adminController.js
-│   │   ├── authController.js
-│   │   ├── errorController.js
-│   │   ├── evaluationController.js
-│   │   ├── formationController.js
-│   │   ├── matiereController.js
-│   │   ├── niveauController.js
-│   │   ├── parentController.js
-│   │   ├── pointageController.js
-│   │   ├── presenceStudentController.js
-│   │   ├── presenceTeacherController.js
-│   │   ├── smsController.js
-│   │   ├── studentController.js
-│   │   ├── teacherController.js
-│   │   └── uniteEnseignementController.js
-│   └── socket
-│       ├── location.controller.js
-│       └── socket.controller.js
-├── middlewares
-│   ├── auth.middleware.js
-│   ├── device.middleware.js
-│   ├── jwt.middleware.js
-│   └── socket.middleware.js
-├── models
-│   ├── Admin.js
-│   ├── Evaluation.js
-│   ├── Formation.js
-│   ├── Matiere.js
-│   ├── Niveau.js
-│   ├── Parent.js
-│   ├── Pointage.js
-│   ├── PresenceStudent.js
-│   ├── PresenceTeacher.js
-│   ├── Sms.js
-│   ├── Student.js
-│   ├── Teacher.js
-│   ├── UniteEnseignement.js
-│   └── User.js
-├── routes
-│   ├── admin.routes.js
-│   ├── app.routes.js
-│   ├── auth.routes.js
-│   ├── evaluation.routes.js
-│   ├── formation.routes.js
-│   ├── index.routes.js
-│   ├── matiere.routes.js
-│   ├── niveau.routes.js
-│   ├── parent.routes.js
-│   ├── pointage.routes.js
-│   ├── presenceStudent.routes.js
-│   ├── presenceTeacher.routes.js
-│   ├── sms.routes.js
-│   ├── student.routes.js
-│   ├── teacher.routes.js
-│   ├── ue.routes.js
-│   └── user.routes.js
-├── services
-│   ├── api
-│   │   ├── admin.service.js
-│   │   ├── evaluation.service.js
-│   │   ├── formation.service.js
-│   │   ├── matiere.service.js
-│   │   ├── niveau.service.js
-│   │   ├── parent.service.js
-│   │   ├── pointage.service.js
-│   │   ├── smsService.js
-│   │   ├── student.service.js
-│   │   ├── teacher.service.js
-│   │   └── uniteEnseignement.service.js
-│   ├── auth
-│   │   └── auth.service.js
-│   └── socket
-│       ├── index.service.js
-│       ├── message.service.js
-│       ├── notification.service.js
-│       ├── tracking.service.js
-│       └── user.service.js
-├── utils
-│   ├── apiFeatures.js
-│   ├── common.utils.js
-│   ├── constants.js
-│   ├── exceptions.js
-│   ├── integrety.utils.js
-│   ├── mail.utils.js
-│   ├── mail2.util.js
-│   └── stringFormat.util.js
-├── .env
-└── README.md
-````
