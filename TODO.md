@@ -1,5 +1,7 @@
 - Deleguer vers les services
-- Retirer les isDeleted users des fetch()
 - Ajouter grades enseignants
 - Documentation avec Swagger
-- Gerer les populate
+- helmet JS (protection API)
+- Generer email sur user schema
+- ajouter firstName et lastNAme
+- logging avec morgan

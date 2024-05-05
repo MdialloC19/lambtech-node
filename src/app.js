@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import http from "http";
 import bodyParser from "body-parser";
 import cors from "cors";
+import helmet from "helmet";
 
 import socketConfig from "../config/socket.config.js";
 import routes from "./routes/index.routes.js";
@@ -18,6 +19,7 @@ connectDB();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(helmet());
 
 app.use("/api/v1", routes);
 // welcome message
