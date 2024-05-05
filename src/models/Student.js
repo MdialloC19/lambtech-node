@@ -18,7 +18,7 @@ const StudentSchema = new mongoose.Schema({
   studentStatus: {
     type: String,
     enum: ["EXPELLED", "SUSPENDED", "AUTHORIZED"],
-    default: "active",
+    default: "AUTHORIZED",
   },
   isDeleted: {
     type: Boolean,
