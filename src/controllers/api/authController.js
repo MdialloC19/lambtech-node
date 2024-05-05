@@ -1,78 +1,75 @@
 import { validationResult } from "express-validator";
 import User from "../../models/User.js";
 import bcrypt from "bcryptjs";
-import Teacher from "../../models/Teacher.js";
-import { createTeacherUser } from "./teacherController.js";
-// const config = require("config");
 import jwt from "jsonwebtoken";
 
+/**
+ * Enregistre un nouvel utilisateur
+ * @param {import('express').Request} req - Requête Express
+ * @param {import('express').Response} res - Réponse Express
+ * @returns {Promise<void>} - Promesse indiquant la fin du traitement
+ */
 const authRegisterUser = async (req, res) => {
+  // Validation des données de la requête
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { username, email, phone, password, role, salary } = req.body;
+  const {
+    firstname,
+    lastname,
+    dateofbirth,
+    placeofbirth,
+    nationality,
+    address,
+    sexe,
+    email,
+    phone,
+    password,
+    role,
+  } = req.body;
 
   try {
+    // Vérifie si l'utilisateur existe déjà
     let user = await User.findOne({ email });
-
     if (user) {
-      return res.status(400).json({
-        errors: [{ msg: "User already exists" }],
-      });
+      return res.status(400).json({ errors: [{ msg: "User already exists" }] });
     }
 
+    // Crée un nouvel utilisateur
     user = new User({
-      username,
+      firstname,
+      lastname,
+      dateofbirth,
+      placeofbirth,
+      nationality,
+      address,
+      sexe,
       email,
       phone,
       password,
       role,
     });
 
-    // Encrypt password
-
+    // Hash du mot de passe
     const salt = await bcrypt.genSalt(10);
-
     user.password = await bcrypt.hash(password, salt);
 
+    // Enregistre l'utilisateur dans la base de données
     await user.save();
 
-    // Return jsonwebtoken
-    console.log(user.role);
-    // if (user.role == "TEACHER") {
-    try {
-      const teacherInfos = {
-        username,
-        email,
-        phone,
-        user: user._id,
-        salary,
-      };
-      const teacher = await Teacher.create({
-        ...teacherInfos,
-      });
-      console.log("ok");
-    } catch (error) {
-      console.error(error);
-      // Handle errors during document creation
-      let errorMessage = "Failed to create teacher.";
-      if (error.name === "ValidationError") {
-        errorMessage = error.message; // Mongoose validation error
-      } else if (error.code === 11000) {
-        errorMessage = "Duplicate key error. Please check unique fields.";
-      }
-    }
-    // }
+    // Crée un token JWT
     const payload = {
       user: {
         id: user.id,
-        username: user.username,
+        firstname: user.firstname,
+        lastname: user.lastname,
         role: user.role,
       },
     };
 
+    // Signe le token
     jwt.sign(
       payload,
       process.env.jwtSecret,
@@ -81,84 +78,26 @@ const authRegisterUser = async (req, res) => {
         if (err) throw err;
         return res.status(201).json({
           token,
-          sucess: true,
+          success: true,
           message: "User registered",
         });
       }
     );
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
     res.status(500).json({
-      sucess: false,
+      success: false,
       error: [error.message],
     });
   }
 };
 
-// const authLoginUser = async (req, res) => {
-//   const errors = validationResult(req);
-//   if (!errors.isEmpty()) {
-//     return res.status(400).json({ errors: errors.array() });
-//   }
-
-//   const { email, password } = req.body;
-//   // console.log(email, password);
-
-//   try {
-//     let user = await User.findOne({ email });
-//     console.log(user);
-//     //see if user exists
-//     if (!user) {
-//       return res.status(400).json({
-//         errors: [{ msg: "Invalid Credentials user" }],
-//       });
-//     }
-
-//     const isMatch = await bcrypt.compare(password, user.password);
-
-//     if (!isMatch) {
-//       return res.status(400).json({
-//         errors: [{ msg: "Invalid Credentials" }],
-//       });
-//     }
-//     // Encrypt password
-
-//     // Return jsonwebtoken
-
-//     const payload = {
-//       user: {
-//         id: user.id,
-//         username: user.username,
-//         role: user.role,
-//       },
-//     };
-
-//     jwt.sign(
-//       payload,
-//       process.env.jwtSecret,
-//       { expiresIn: "5 days" },
-//       (err, token) => {
-//         if (err) throw err;
-//         return res.status(201).json({
-//           token,
-//           sucess: true,
-//           message: "Authentificated",
-//         });
-//       }
-//     );
-//     return res.status(201).json({
-//       sucess: true,
-//       message: "Authentificated",
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({
-//       sucess: false,
-//       error: error.message,
-//     });
-//   }
-// };
-
+/**
+ * Authentifie un utilisateur
+ * @param {import('express').Request} req - Requête Express
+ * @param {import('express').Response} res - Réponse Express
+ * @returns {Promise<void>} - Promesse indiquant la fin du traitement
+ */
 const authLoginUser = async (req, res) => {
   try {
     // Validation des champs
