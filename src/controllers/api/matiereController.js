@@ -1,6 +1,11 @@
 import Matiere from "../../models/Matiere.js";
 
-// Créer une matière
+/**
+ * Crée une nouvelle matière
+ * @param {import('express').Request} req - Requête Express
+ * @param {import('express').Response} res - Réponse Express
+ * @returns {Promise<void>} - Promesse indiquant la fin du traitement
+ */
 const createMatiere = async (req, res) => {
   try {
     const matiere = await Matiere.create(req.body);
@@ -10,7 +15,12 @@ const createMatiere = async (req, res) => {
   }
 };
 
-// Obtenir toutes les matières
+/**
+ * Récupère toutes les matières
+ * @param {import('express').Request} req - Requête Express
+ * @param {import('express').Response} res - Réponse Express
+ * @returns {Promise<void>} - Promesse indiquant la fin du traitement
+ */
 const getAllMatieres = async (req, res) => {
   try {
     const matieres = await Matiere.find({ isDelete: false });
@@ -20,7 +30,12 @@ const getAllMatieres = async (req, res) => {
   }
 };
 
-// Obtenir une seule matière par son identifiant
+/**
+ * Récupère une seule matière par son identifiant
+ * @param {import('express').Request} req - Requête Express
+ * @param {import('express').Response} res - Réponse Express
+ * @returns {Promise<void>} - Promesse indiquant la fin du traitement
+ */
 const getMatiereById = async (req, res) => {
   try {
     const matiere = await Matiere.findOne({
@@ -36,7 +51,12 @@ const getMatiereById = async (req, res) => {
   }
 };
 
-// Mettre à jour une matière
+/**
+ * Met à jour une matière
+ * @param {import('express').Request} req - Requête Express
+ * @param {import('express').Response} res - Réponse Express
+ * @returns {Promise<void>} - Promesse indiquant la fin du traitement
+ */
 const updateMatiere = async (req, res) => {
   try {
     const matiere = await Matiere.findOneAndUpdate(
@@ -53,7 +73,12 @@ const updateMatiere = async (req, res) => {
   }
 };
 
-// Supprimer une matière en mode soft delete
+/**
+ * Supprime une matière en mode soft delete
+ * @param {import('express').Request} req - Requête Express
+ * @param {import('express').Response} res - Réponse Express
+ * @returns {Promise<void>} - Promesse indiquant la fin du traitement
+ */
 const deleteMatiere = async (req, res) => {
   try {
     const matiere = await Matiere.findOneAndUpdate(
