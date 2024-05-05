@@ -14,6 +14,29 @@ import integretyTester from "../../utils/integrety.utils.js";
  * @param {ExpressResponse} res - The response object.
  * @returns {Promise<void>} - A promise that resolves when the teacher is created.
  */
+
+export async function createTeacherUser(username, email, phone, idUser) {
+  try {
+    const teacherInfos = {
+      username,
+      email,
+      phone,
+      idUser,
+    };
+    const teacher = await Teacher.create({
+      ...teacherInfos,
+    });
+    console.log("ok");
+  } catch (error) {
+    // Handle errors during document creation
+    let errorMessage = "Failed to create teacher.";
+    if (error.name === "ValidationError") {
+      errorMessage = error.message; // Mongoose validation error
+    } else if (error.code === 11000) {
+      errorMessage = "Duplicate key error. Please check unique fields.";
+    }
+  }
+}
 export async function createTeacher(req, res) {
   const { teacherInfos, userInfos } = req.body;
 
