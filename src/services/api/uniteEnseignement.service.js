@@ -19,7 +19,7 @@ export default class UniteEnseignementService {
       const unitesEnseignement = await features.query;
       return unitesEnseignement;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -36,7 +36,7 @@ export default class UniteEnseignementService {
       );
       return newUniteEnseignement;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -52,11 +52,11 @@ export default class UniteEnseignementService {
         uniteEnseignementId
       );
       if (!uniteEnseignement) {
-        throw new HttpError(404, "Unité d'enseignement not found.");
+        throw new HttpError(null, 404, "Unité d'enseignement not found.");
       }
       return uniteEnseignement;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -76,11 +76,11 @@ export default class UniteEnseignementService {
           { new: true }
         );
       if (!updatedUniteEnseignement) {
-        throw new HttpError(404, "Unité d'enseignement not found.");
+        throw new HttpError(null, 404, "Unité d'enseignement not found.");
       }
       return updatedUniteEnseignement;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -96,13 +96,13 @@ export default class UniteEnseignementService {
         uniteEnseignementId
       );
       if (!uniteEnseignement) {
-        throw new HttpError(404, "Unité d'enseignement not found.");
+        throw new HttpError(null, 404, "Unité d'enseignement not found.");
       }
       uniteEnseignement.isDeleted = true;
       await uniteEnseignement.save();
       return { message: "Unité d'enseignement removed" };
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 }
