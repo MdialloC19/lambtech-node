@@ -1,183 +1,100 @@
-import Evaluation from "../../models/Evaluation.js";
+import EvaluationService from "../../services/api/evaluation.service.js";
+import { HttpError } from "../../utils/exceptions.js";
 
-/**
- * Récupère les évaluations d'un étudiant pour une matière donnée
- * @param {import('express').Request} req - Requête Express
- * @param {import('express').Response} res - Réponse Express
- * @returns {Promise<void>} - Promesse indiquant la fin du traitement
- */
-export const getEvaluationsByStudentAndMatiere = async (req, res) => {
+export async function getEvaluationsByStudentAndMatiere(req, res) {
+  const { studentId, matiereId } = req.params;
   try {
-    const studentId = req.params.studentId;
-    const matiereId = req.params.matiereId;
-
-    const evaluations = await Evaluation.find({
-      student: studentId,
-      matiere: matiereId,
-      isDeleted: false,
-    })
-      .populate("matiere", "name")
-      .populate("student", "name");
-
-    res.json(evaluations);
-  } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .send(
-        "Une erreur s'est produite lors de la récupération des évaluations"
+    const evaluations =
+      await EvaluationService.getEvaluationsByStudentAndMatiere(
+        studentId,
+        matiereId
       );
-  }
-};
-
-/**
- * Récupère les évaluations d'un enseignant pour une matière donnée
- * @param {import('express').Request} req - Requête Express
- * @param {import('express').Response} res - Réponse Express
- * @returns {Promise<void>} - Promesse indiquant la fin du traitement
- */
-export const getEvaluationsByTeacherAndMatiere = async (req, res) => {
-  try {
-    const teacherId = req.params.teacherId;
-    const matiereId = req.params.matiereId;
-
-    const evaluations = await Evaluation.find({
-      teacher: teacherId,
-      matiere: matiereId,
-      isDeleted: false,
-    })
-      .populate("matiere", "intitule code coefficient")
-      .populate("teacher", "name");
-
     res.json(evaluations);
-  } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .send(
-        "Une erreur s'est produite lors de la récupération des évaluations"
-      );
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).send(error.message);
+    } else {
+      res.status(500).send("Internal Server Error");
+    }
   }
-};
+}
 
-/**
- * Crée une nouvelle évaluation
- * @param {import('express').Request} req - Requête Express
- * @param {import('express').Response} res - Réponse Express
- * @returns {Promise<void>} - Promesse indiquant la fin du traitement
- */
-export const createEvaluation = async (req, res) => {
+export async function getEvaluationsByTeacherAndMatiere(req, res) {
+  const { teacherId, matiereId } = req.params;
   try {
-    const { teacher, matiere, student, noteTP, noteCC, noteDS } = req.body;
+    const evaluations =
+      await EvaluationService.getEvaluationsByTeacherAndMatiere(
+        teacherId,
+        matiereId
+      );
+    res.json(evaluations);
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).send(error.message);
+    } else {
+      res.status(500).send("Internal Server Error");
+    }
+  }
+}
 
-    const newEvaluation = new Evaluation({
-      teacher,
-      matiere,
-      student,
-      noteTP,
-      noteCC,
-      noteDS,
-    });
-
-    const savedEvaluation = await newEvaluation.save();
-
+export async function createEvaluation(req, res) {
+  const evaluationData = req.body;
+  try {
+    const savedEvaluation = await EvaluationService.createEvaluation(
+      evaluationData
+    );
     res.status(201).json(savedEvaluation);
-  } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .send("Une erreur s'est produite lors de la création de l'évaluation");
-  }
-};
-
-/**
- * Récupère une évaluation par son ID
- * @param {import('express').Request} req - Requête Express
- * @param {import('express').Response} res - Réponse Express
- * @returns {Promise<void>} - Promesse indiquant la fin du traitement
- */
-export const getEvaluationById = async (req, res) => {
-  try {
-    const evaluationId = req.params.id;
-
-    const evaluation = await Evaluation.findOne({
-      _id: evaluationId,
-      isDeleted: false,
-    })
-      .populate("matiere", "intitule code coefficient")
-      .populate("teacher", "name")
-      .populate("student", "name");
-
-    if (!evaluation) {
-      res.status(404).send("L'évaluation demandée n'a pas été trouvée");
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).send(error.message);
     } else {
-      res.json(evaluation);
+      res.status(500).send("Internal Server Error");
     }
-  } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .send(
-        "Une erreur s'est produite lors de la récupération de l'évaluation"
-      );
   }
-};
+}
 
-/**
- * Met à jour une évaluation
- * @param {import('express').Request} req - Requête Express
- * @param {import('express').Response} res - Réponse Express
- * @returns {Promise<void>} - Promesse indiquant la fin du traitement
- */
-export const updateEvaluation = async (req, res) => {
+export async function getEvaluationById(req, res) {
+  const { id } = req.params;
   try {
-    const evaluationId = req.params.id;
-    const update = req.body;
+    const evaluation = await EvaluationService.getEvaluationById(id);
+    res.json(evaluation);
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).send(error.message);
+    } else {
+      res.status(500).send("Internal Server Error");
+    }
+  }
+}
 
-    const updatedEvaluation = await Evaluation.findOneAndUpdate(
-      { _id: evaluationId, isDeleted: false },
-      update,
-      { new: true }
+export async function updateEvaluation(req, res) {
+  const { id } = req.params;
+  const update = req.body;
+  try {
+    const updatedEvaluation = await EvaluationService.updateEvaluation(
+      id,
+      update
     );
-
-    if (!updatedEvaluation) {
-      res.status(404).send("L'évaluation à mettre à jour n'a pas été trouvée");
+    res.json(updatedEvaluation);
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).send(error.message);
     } else {
-      res.json(updatedEvaluation);
+      res.status(500).send("Internal Server Error");
     }
-  } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .send("Une erreur s'est produite lors de la mise à jour de l'évaluation");
   }
-};
+}
 
-/**
- * Supprime une évaluation
- * @param {import('express').Request} req - Requête Express
- * @param {import('express').Response} res - Réponse Express
- * @returns {Promise<void>} - Promesse indiquant la fin du traitement
- */
-export const deleteEvaluation = async (req, res) => {
+export async function deleteEvaluation(req, res) {
+  const { id } = req.params;
   try {
-    const evaluationId = req.params.id;
-
-    const deletedEvaluation = await Evaluation.findOneAndUpdate(
-      { _id: evaluationId, isDeleted: false },
-      { isDeleted: true },
-      { new: true }
-    );
-
-    if (!deletedEvaluation) {
-      res.status(404).send("L'évaluation à supprimer n'a pas été trouvée");
+    await EvaluationService.deleteEvaluation(id);
+    res.sendStatus(204);
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).send(error.message);
     } else {
-      res.sendStatus(204);
+      res.status(500).send("Internal Server Error");
     }
-  } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .send("Une erreur s'est produite lors de la suppression de l'évaluation");
   }
-};
+}
