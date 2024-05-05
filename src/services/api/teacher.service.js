@@ -21,19 +21,19 @@ export default class TeacherService {
 
     // Basic validation checks
     if (rank && typeof rank !== "string") {
-      throw new HttpError(error, 400, "Rank is required and must be a string.");
+      throw new HttpError(null, 400, "Rank is required and must be a string.");
     }
 
     if (hiringDate && (!(hiringDate instanceof Date) || isNaN(hiringDate))) {
-      throw new HttpError(error, 400, "Invalid hiring date.");
+      throw new HttpError(null, 400, "Invalid hiring date.");
     }
 
     if (hiringDate && new Date(teacherInfos.hiringDate) > new Date()) {
-      throw new HttpError(error, 400, "Hiring date cannot be in the future.");
+      throw new HttpError(null, 400, "Hiring date cannot be in the future.");
     }
 
     if (qualification && !Array.isArray(qualification)) {
-      throw new HttpError(error, 400, "Qualification must be an array.");
+      throw new HttpError(null, 400, "Qualification must be an array.");
     }
 
     if (
@@ -48,11 +48,11 @@ export default class TeacherService {
     }
 
     if (salary && (typeof salary !== "number" || salary < 0)) {
-      throw new HttpError(error, 400, "Salary must be a non-negative number.");
+      throw new HttpError(null, 400, "Salary must be a non-negative number.");
     }
 
     if (schedule && (!Array.isArray(schedule) || schedule.length === 0)) {
-      throw new HttpError(error, 400, "Schedule must be a non-empty array.");
+      throw new HttpError(null, 400, "Schedule must be a non-empty array.");
     }
 
     if (schedule)
@@ -60,7 +60,7 @@ export default class TeacherService {
         const { dayOfWeek, startTime, endTime } = slot;
         if (!dayOfWeek || !startTime || !endTime) {
           throw new HttpError(
-            err,
+            null,
             400,
             "Schedule slot is missing required fields."
           );
@@ -132,13 +132,13 @@ export default class TeacherService {
       );
 
       if (!teacher) {
-        throw new HttpError(error, 404, "Teacher not found.");
+        throw new HttpError(null, 404, "Teacher not found.");
       }
 
       // update user
       const user = await UserService.updateUser(teacher.user, updatedUserData);
       if (!user) {
-        throw new HttpError(error, 404, "User not found.");
+        throw new HttpError(null, 404, "User not found.");
       }
 
       return teacher;
@@ -165,13 +165,13 @@ export default class TeacherService {
       const teacher = await Teacher.findOne(teacherId).populate("user");
 
       if (!teacher) {
-        throw new HttpError(error, 404, "Teacher not found.");
+        throw new HttpError(null, 404, "Teacher not found.");
       }
 
       // mark associated user as deleted
       const user = await UserService.deleteUser(teacher.user._id);
       if (!user) {
-        throw new HttpError(error, 404, "User not found.");
+        throw new HttpError(null, 404, "User not found.");
       }
 
       return teacher;
@@ -201,7 +201,7 @@ export default class TeacherService {
       );
 
       if (!teacher) {
-        throw new HttpError(error, 404, "Teacher not found.");
+        throw new HttpError(null, 404, "Teacher not found.");
       }
 
       return teacher;
@@ -232,7 +232,7 @@ export default class TeacherService {
         .skip((pagination.pageNumber - 1) * pagination.pageCount)
         .limit(pagination.pageCount);
       if (teachers.length === 0) {
-        throw new HttpError(error, 404, "No teachers found.");
+        throw new HttpError(null, 404, "No teachers found.");
       }
       return teachers;
     } catch (error) {

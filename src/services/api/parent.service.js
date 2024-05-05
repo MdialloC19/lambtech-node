@@ -14,23 +14,31 @@ export default class ParentService {
       // Create user for the parent
       const user = await UserService.createUser(parentData);
 
+      if (!user) {
+        throw new HttpError(null, 404, "User not found.");
+      }
+
       // Create new parent using Mongoose model
       const parent = await Parent.create({
         user: user._id,
       });
+
+      if (!parent) {
+        throw new HttpError(null, 400, "Parent not created.");
+      }
 
       return parent;
     } catch (error) {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "ValidationError") {
-        throw new HttpError(400, error.message);
-      } else if (error.name === "MongoError" && error.code === 11000) {
-        throw new HttpError(400, "Email already exists.");
+        throw new HttpError(error, 400, error.message);
+      } else if (error.name === "MongoServerError" && error.code === 11000) {
+        throw new HttpError(error, 400, "Email already exists.");
       } else if (error.name === "CastError") {
-        throw new HttpError(400, "Invalid ID.");
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -47,13 +55,13 @@ export default class ParentService {
       // Update parent using Mongoose model
       const parent = await Parent.findById(parentId);
       if (!parent) {
-        throw new HttpError(404, "Parent not found.");
+        throw new HttpError(null, 404, "Parent not found.");
       }
 
       const user = await UserService.updateUser(parent.user, updatedParentData);
 
       if (!user) {
-        throw new HttpError(404, "User not found.");
+        throw new HttpError(null, 404, "User not found.");
       }
 
       return user;
@@ -61,9 +69,9 @@ export default class ParentService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "CastError") {
-        throw new HttpError(400, "Invalid ID.");
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -80,7 +88,7 @@ export default class ParentService {
       const parent = await Parent.findById(parentId);
 
       if (!parent) {
-        throw new HttpError(404, "Parent not found.");
+        throw new HttpError(null, 404, "Parent not found.");
       }
 
       await UserService.deleteUser(parent.user);
@@ -90,9 +98,9 @@ export default class ParentService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "CastError") {
-        throw new HttpError(400, "Invalid ID.");
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -112,7 +120,7 @@ export default class ParentService {
       );
 
       if (!parent) {
-        throw new HttpError(404, "Parent not found.");
+        throw new HttpError(null, 404, "Parent not found.");
       }
 
       return parent;
@@ -120,9 +128,9 @@ export default class ParentService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "CastError") {
-        throw new HttpError(400, "Invalid ID.");
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -147,7 +155,7 @@ export default class ParentService {
         .limit(pagination.pageCount);
 
       if (parents.length === 0) {
-        throw new HttpError(404, "No parents found.");
+        throw new HttpError(null, 404, "No parents found.");
       }
 
       return parents;
@@ -155,7 +163,7 @@ export default class ParentService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }

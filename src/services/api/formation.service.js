@@ -17,9 +17,14 @@ export default class FormationService {
         .limitFields()
         .paginate();
       const formations = await features.query;
+
+      if (!formations) {
+        throw new HttpError(null, 404, "Formations not found.");
+      }
+
       return formations;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -32,14 +37,19 @@ export default class FormationService {
   static async createFormation(formData) {
     try {
       const newFormation = await Formation.create(formData);
+
+      if (!newFormation) {
+        throw new HttpError(null, 400, "Formation not created.");
+      }
+
       return newFormation;
     } catch (error) {
       if (error.name === "ValidationError") {
-        throw new HttpError(400, error.message);
-      } else if (error.name === "MongoError" && error.code === 11000) {
-        throw new HttpError(400, "Formation already exists.");
+        throw new HttpError(error, 400, error.message);
+      } else if (error.name === "MongoServerError" && error.code === 11000) {
+        throw new HttpError(error, 400, "Formation already exists.");
       } else {
-        throw new HttpError(500, "Internal server error.");
+        throw new HttpError(error, 500, "Internal server error.");
       }
     }
   }
@@ -54,11 +64,11 @@ export default class FormationService {
     try {
       const formation = await Formation.findById(formationId);
       if (!formation) {
-        throw new HttpError(404, "Formation not found.");
+        throw new HttpError(null, 404, "Formation not found.");
       }
       return formation;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -77,11 +87,11 @@ export default class FormationService {
         { new: true }
       );
       if (!updatedFormation) {
-        throw new HttpError(404, "Formation not found.");
+        throw new HttpError(null, 404, "Formation not found.");
       }
       return updatedFormation;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -95,12 +105,12 @@ export default class FormationService {
     try {
       const formation = await Formation.findById(formationId);
       if (!formation) {
-        throw new HttpError(404, "Formation not found.");
+        throw new HttpError(null, 404, "Formation not found.");
       }
       await formation.remove();
       return { message: "Formation removed" };
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 }

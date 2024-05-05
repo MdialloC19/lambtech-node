@@ -19,9 +19,14 @@ export default class StudentService {
         .limitFields()
         .paginate();
       const students = await features.query;
+
+      if (!students) {
+        throw new HttpError(null, 404, "Students not found.");
+      }
+
       return students;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -35,7 +40,7 @@ export default class StudentService {
   static async createStudent(studentData, userData) {
     try {
       if (!integretyTester.isEmail(userData.email)) {
-        throw new HttpError(400, "Email is not valid.");
+        throw new HttpError(null, 400, "Email is not valid.");
       }
 
       const user = await User.create(userData);
@@ -43,14 +48,15 @@ export default class StudentService {
       return student;
     } catch (error) {
       if (error.name === "ValidationError") {
-        throw new HttpError(400, error.message);
+        throw new HttpError(error, 400, error.message);
       } else if (error.code === 11000) {
         throw new HttpError(
+          error,
           400,
           "Duplicate key error. Please check unique fields."
         );
       } else {
-        throw new HttpError(500, "Internal server error.");
+        throw new HttpError(error, 500, "Internal server error.");
       }
     }
   }
@@ -65,11 +71,11 @@ export default class StudentService {
     try {
       const student = await Student.findById(studentId);
       if (!student) {
-        throw new HttpError(404, "Student not found.");
+        throw new HttpError(null, 404, "Student not found.");
       }
       return student;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -88,11 +94,11 @@ export default class StudentService {
         { new: true }
       );
       if (!updatedStudent) {
-        throw new HttpError(404, "Student not found.");
+        throw new HttpError(null, 404, "Student not found.");
       }
       return updatedStudent;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -106,14 +112,14 @@ export default class StudentService {
     try {
       const student = await Student.findById(studentId);
       if (!student) {
-        throw new HttpError(404, "Student not found.");
+        throw new HttpError(null, 404, "Student not found.");
       }
       await student.remove();
       // Mark associated user as deleted
       await User.findByIdAndUpdate(student.user, { isDeleted: true });
       return { message: "Student removed" };
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 }

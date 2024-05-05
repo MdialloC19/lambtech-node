@@ -17,9 +17,14 @@ export default class NiveauService {
         .limitFields()
         .paginate();
       const niveaux = await features.query;
+
+      if (!niveaux) {
+        throw new HttpError(null, 404, "Niveaux not found.");
+      }
+
       return niveaux;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -32,14 +37,19 @@ export default class NiveauService {
   static async createNiveau(niveauData) {
     try {
       const newNiveau = await Niveau.create(niveauData);
+
+      if (!newNiveau) {
+        throw new HttpError(null, 400, "Niveau not created.");
+      }
+
       return newNiveau;
     } catch (error) {
       if (error.name === "ValidationError") {
-        throw new HttpError(400, error.message);
-      } else if (error.name === "MongoError" && error.code === 11000) {
-        throw new HttpError(400, "Niveau already exists.");
+        throw new HttpError(error, 400, error.message);
+      } else if (error.name === "MongoServerError" && error.code === 11000) {
+        throw new HttpError(error, 400, "Niveau already exists.");
       } else {
-        throw new HttpError(500, "Internal server error.");
+        throw new HttpError(error, 500, "Internal server error.");
       }
     }
   }
@@ -54,11 +64,11 @@ export default class NiveauService {
     try {
       const niveau = await Niveau.findById(niveauId);
       if (!niveau) {
-        throw new HttpError(404, "Niveau not found.");
+        throw new HttpError(null, 404, "Niveau not found.");
       }
       return niveau;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -77,11 +87,11 @@ export default class NiveauService {
         { new: true }
       );
       if (!updatedNiveau) {
-        throw new HttpError(404, "Niveau not found.");
+        throw new HttpError(null, 404, "Niveau not found.");
       }
       return updatedNiveau;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 
@@ -95,12 +105,12 @@ export default class NiveauService {
     try {
       const niveau = await Niveau.findById(niveauId);
       if (!niveau) {
-        throw new HttpError(404, "Niveau not found.");
+        throw new HttpError(null, 404, "Niveau not found.");
       }
       await niveau.remove();
       return { message: "Niveau removed" };
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 }

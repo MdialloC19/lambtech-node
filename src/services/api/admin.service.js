@@ -14,10 +14,18 @@ export default class AdminService {
       // create user
       const user = await UserService.createUser(adminData);
 
+      if (!user) {
+        throw new HttpError(null, 404, "User not found.");
+      }
+
       // Create new admin using Mongoose model
       const admin = await Admin.create({
         user: user._id,
       });
+
+      if (!admin) {
+        throw new HttpError(null, 400, "Admin not created.");
+      }
 
       return admin;
     } catch (error) {
