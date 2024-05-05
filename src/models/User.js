@@ -1,9 +1,34 @@
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
-  username: {
+  firstname: {
     type: String,
-    required: [true, "Please give the name"],
+    required: [true, "Please give the firstname"],
+  },
+  lastname: {
+    type: String,
+    required: [true, "Please give the lastname"],
+  },
+  dateofbirth: {
+    type: Date,
+    required: [true, "Please give the date of birth"],
+  },
+  placeofbirth: {
+    type: String,
+    required: [true, "Please give the place of birth"],
+  },
+  nationality: {
+    type: String,
+    required: [true, "Please give the nationality"],
+  },
+  address: {
+    type: String,
+    required: [true, "Please give the address"],
+  },
+  sexe: {
+    type: String,
+    required: [true, "Please give thesexe"],
+    enum: ["M", "F"], // ['M', 'F']
   },
   email: {
     type: String,
