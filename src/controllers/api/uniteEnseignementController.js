@@ -1,111 +1,83 @@
-import UniteEnseignement from "../../models/UniteEnseignement.js";
-import APIFeatures from "../../utils/apiFeatures.js";
+import UniteEnseignementService from "../../services/api/uniteEnseignement.service.js";
 
 /**
- * @route   GET /api/unitesEnseignement
- * @desc    Get all unités d'enseignement
- * @access  Public
+ * Retrieves all units of teaching.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the JSON response containing all units of teaching.
  */
-const getUnitesEnseignement = async (req, res) => {
+export async function getUnitesEnseignement(req, res) {
   try {
-    const features = new APIFeatures(UniteEnseignement.find(), req.query)
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
-    const unitesEnseignements = await features.query;
-    res.json(unitesEnseignements);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+    const unitesEnseignement =
+      await UniteEnseignementService.getAllUnitesEnseignement(req.query);
+    res.json(unitesEnseignement);
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
-};
+}
 
 /**
- * @route   POST /api/unitesEnseignement
- * @desc    Create a new unité d'enseignement
- * @access  Public
+ * Creates a new unit of teaching.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the JSON response containing the newly created unit of teaching.
  */
-const createUniteEnseignement = async (req, res) => {
+export async function createUniteEnseignement(req, res) {
   try {
-    const newUniteEnseignement = await UniteEnseignement.create(req.body);
+    const newUniteEnseignement =
+      await UniteEnseignementService.createUniteEnseignement(req.body);
     res.status(201).json(newUniteEnseignement);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
-};
+}
 
 /**
- * @route   GET /api/unitesEnseignement/:id
- * @desc    Get a single unité d'enseignement by ID
- * @access  Public
+ * Retrieves a unit of teaching by its ID.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the JSON response containing the unit of teaching with the specified ID.
  */
-const getUniteEnseignementById = async (req, res) => {
+export async function getUniteEnseignementById(req, res) {
+  const { id } = req.params;
   try {
-    const uniteEnseignement = await UniteEnseignement.findById(req.params.id);
-    if (!uniteEnseignement) {
-      return res.status(404).json({ msg: "Unité d'enseignement not found" });
-    }
+    const uniteEnseignement =
+      await UniteEnseignementService.getUniteEnseignementById(id);
     res.json(uniteEnseignement);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
-};
+}
 
 /**
- * @route   PUT /api/unitesEnseignement/:id
- * @desc    Update an unité d'enseignement
- * @access  Public
+ * Updates a unit of teaching.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the JSON response containing the updated unit of teaching.
  */
-const updateUniteEnseignement = async (req, res) => {
+export async function updateUniteEnseignement(req, res) {
+  const { id } = req.params;
   try {
-    let uniteEnseignement = await UniteEnseignement.findById(req.params.id);
-    if (!uniteEnseignement) {
-      return res.status(404).json({ msg: "Unité d'enseignement not found" });
-    }
-    uniteEnseignement = await UniteEnseignement.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-      }
-    );
-    res.json(uniteEnseignement);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+    const updatedUniteEnseignement =
+      await UniteEnseignementService.updateUniteEnseignement(id, req.body);
+    res.json(updatedUniteEnseignement);
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
-};
+}
 
 /**
- * @route   DELETE /api/unitesEnseignement/:id
- * @desc    Delete an unité d'enseignement
- * @access  Public
+ * Deletes a unit of teaching.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the JSON response indicating the success of the deletion.
  */
-const deleteUniteEnseignement = async (req, res) => {
+export async function deleteUniteEnseignement(req, res) {
+  const { id } = req.params;
   try {
-    const uniteEnseignement = await UniteEnseignement.findById(req.params.id);
-    if (!uniteEnseignement) {
-      return res.status(404).json({ msg: "Unité d'enseignement not found" });
-    }
-
-    // Marquer l'unité d'enseignement comme supprimée
-    uniteEnseignement.isDeleted = true;
-    await uniteEnseignement.save();
-
-    res.json({ msg: "Unité d'enseignement removed" });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+    const result = await UniteEnseignementService.deleteUniteEnseignement(id);
+    res.json(result);
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ message: error.message });
   }
-};
-
-export {
-  getUnitesEnseignement,
-  createUniteEnseignement,
-  getUniteEnseignementById,
-  updateUniteEnseignement,
-  deleteUniteEnseignement,
-};
+}

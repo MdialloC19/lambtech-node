@@ -1,101 +1,100 @@
-import Niveau from "../../models/Niveau.js";
-import APIFeatures from "../../utils/apiFeatures.js";
+import NiveauService from "../../services/api/niveau.service.js";
+import { HttpError } from "../../utils/exceptions.js";
 
 /**
- * @route   GET api/niveaux
- * @desc    Get all niveaux
- * @access  Public
+ * Get all niveaux.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
-const getNiveaux = async (req, res) => {
+export async function getNiveaux(req, res) {
   try {
-    const features = new APIFeatures(Niveau.find(), req.query)
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
-    const niveaux = await features.query;
+    const niveaux = await NiveauService.getAllNiveaux(req.query);
     res.json(niveaux);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
-};
+}
 
 /**
- * @route   POST api/niveaux
- * @desc    Create a new niveau
- * @access  Public
+ * Create a new niveau.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
-const createNiveau = async (req, res) => {
+export async function createNiveau(req, res) {
   try {
-    const newNiveau = await Niveau.create(req.body);
+    const newNiveau = await NiveauService.createNiveau(req.body);
     res.status(201).json(newNiveau);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
-};
+}
 
 /**
- * @route   GET api/niveaux/:id
- * @desc    Get a single niveau by ID
- * @access  Public
+ * Get a niveau by ID.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
-const getNiveauById = async (req, res) => {
+export async function getNiveauById(req, res) {
+  const { id } = req.params;
   try {
-    const niveau = await Niveau.findById(req.params.id);
-    if (!niveau) {
-      return res.status(404).json({ msg: "Niveau not found" });
-    }
+    const niveau = await NiveauService.getNiveauById(id);
     res.json(niveau);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
-};
+}
 
 /**
- * @route   PUT api/niveaux/:id
- * @desc    Update a niveau
- * @access  Public
+ * Update a niveau by ID.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
-const updateNiveau = async (req, res) => {
+export async function updateNiveau(req, res) {
+  const { id } = req.params;
   try {
-    let niveau = await Niveau.findById(req.params.id);
-    if (!niveau) {
-      return res.status(404).json({ msg: "Niveau not found" });
+    const updatedNiveau = await NiveauService.updateNiveau(id, req.body);
+    res.json(updatedNiveau);
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
     }
-    niveau = await Niveau.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    res.json(niveau);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
   }
-};
+}
 
 /**
- * @route   DELETE api/niveaux/:id
- * @desc    Delete a niveau
- * @access  Public
+ * Delete a niveau by ID.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
-const deleteNiveau = async (req, res) => {
+export async function deleteNiveau(req, res) {
+  const { id } = req.params;
   try {
-    const niveau = await Niveau.findById(req.params.id);
-    if (!niveau) {
-      return res.status(404).json({ msg: "Niveau not found" });
+    const result = await NiveauService.deleteNiveau(id);
+    res.json(result);
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
     }
-
-    // Marquer le niveau comme supprimé
-    niveau.isDeleted = true;
-    await niveau.save();
-
-    res.json({ msg: "Niveau removed" });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
   }
-};
-
-export { getNiveaux, createNiveau, getNiveauById, updateNiveau, deleteNiveau };
+}

@@ -1,107 +1,102 @@
-import Formation from "../../models/Formation.js";
-import APIFeatures from "../../utils/apiFeatures.js";
+import FormationService from "../../services/api/formation.service.js";
 
 /**
- * @route   GET /api/formations
- * @desc    Get all formations
- * @access  Public
+ * Get all formations.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the formations.
  */
-const getFormations = async (req, res) => {
+export async function getFormations(req, res) {
   try {
-    const features = new APIFeatures(Formation.find(), req.query)
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
-    const formations = await features.query;
+    const formations = await FormationService.getAllFormations(req.query);
     res.json(formations);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+  } catch (error) {
+    if (error.statusCode) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
-};
+}
 
 /**
- * @route   POST /api/formations
- * @desc    Create a new formation
- * @access  Public
+ * Create a new formation.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the newly created formation.
  */
-const createFormation = async (req, res) => {
+export async function createFormation(req, res) {
   try {
-    const newFormation = await Formation.create(req.body);
+    const newFormation = await FormationService.createFormation(req.body);
     res.status(201).json(newFormation);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+  } catch (error) {
+    if (error.statusCode) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
-};
+}
 
 /**
- * @route   GET /api/formations/:id
- * @desc    Get a single formation by ID
- * @access  Public
+ * Get a formation by its ID.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the formation.
  */
-const getFormationById = async (req, res) => {
+export async function getFormationById(req, res) {
+  const { id } = req.params;
   try {
-    const formation = await Formation.findById(req.params.id);
-    if (!formation) {
-      return res.status(404).json({ msg: "Formation not found" });
-    }
+    const formation = await FormationService.getFormationById(id);
     res.json(formation);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+  } catch (error) {
+    if (error.statusCode) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
-};
+}
 
 /**
- * @route   PUT /api/formations/:id
- * @desc    Update a formation
- * @access  Public
+ * Update a formation by its ID.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the updated formation.
  */
-const updateFormation = async (req, res) => {
+export async function updateFormation(req, res) {
+  const { id } = req.params;
   try {
-    let formation = await Formation.findById(req.params.id);
-    if (!formation) {
-      return res.status(404).json({ msg: "Formation not found" });
+    const updatedFormation = await FormationService.updateFormation(
+      id,
+      req.body
+    );
+    res.json(updatedFormation);
+  } catch (error) {
+    if (error.statusCode) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
     }
-    formation = await Formation.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    res.json(formation);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
   }
-};
+}
 
 /**
- * @route   DELETE /api/formations/:id
- * @desc    Delete a formation
- * @access  Public
+ * Delete a formation by its ID.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the result of the deletion.
  */
-const deleteFormation = async (req, res) => {
+export async function deleteFormation(req, res) {
+  const { id } = req.params;
   try {
-    const formation = await Formation.findById(req.params.id);
-    if (!formation) {
-      return res.status(404).json({ msg: "Formation not found" });
+    const result = await FormationService.deleteFormation(id);
+    res.json(result);
+  } catch (error) {
+    if (error.statusCode) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
     }
-
-    // Marquer la formation comme supprimée
-    formation.isDeleted = true;
-    await formation.save();
-
-    res.json({ msg: "Formation removed" });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
   }
-};
-
-export {
-  getFormations,
-  createFormation,
-  getFormationById,
-  updateFormation,
-  deleteFormation,
-};
+}

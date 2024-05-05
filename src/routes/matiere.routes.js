@@ -1,5 +1,5 @@
 import express from "express";
-import matiereController from "../controllers/api/matiereController.js";
+import * as matiereController from "../controllers/api/matiereController.js";
 
 const router = express.Router();
 
