@@ -10,8 +10,9 @@ import formationRoutes from "./formation.routes.js";
 import ueRoutes from "./ue.routes.js";
 import niveauRoutes from "./niveau.routes.js";
 import matiereRoutes from "./matiere.routes.js";
-
 import evaluationRoutes from "./evaluation.routes.js";
+import presenceStudentRoutes from "./presenceStudent.routes.js";
+import presenceTeacherRoutes from "./presenceTeacher.routes.js";
 
 const router = express.Router();
 
@@ -27,6 +28,8 @@ router.use("/ue", ueRoutes);
 router.use("/niveau", niveauRoutes);
 router.use("/matiere", matiereRoutes);
 router.use("/evaluation", evaluationRoutes);
+router.use("/presenceStudent", presenceStudentRoutes);
+router.use("/presenceTeacher", presenceTeacherRoutes);
 
 //export default
 export default router;
