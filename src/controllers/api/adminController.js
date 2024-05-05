@@ -1,5 +1,6 @@
 import AdminService from "../../services/api/admin.service.js";
 import { DEFAULT_PAGINATION } from "../../utils/constants.js";
+import { HttpError } from "../../utils/exceptions.js";
 
 // JSDoc typedefs
 /**
@@ -25,6 +26,7 @@ export async function createAdmin(req, res) {
 
   try {
     await AdminService.createAdmin(userInfos);
+    res.status(201).json({ message: "Admin created successfully" });
   } catch (error) {
     console.error(error);
     if (error instanceof HttpError) {
@@ -42,15 +44,15 @@ export async function createAdmin(req, res) {
  * @returns {Promise<void>} - A promise that resolves when the admins are retrieved.
  */
 export async function getAdmins(req, res) {
-  const { pageNumber = 0, pageCount = DEFAULT_PAGINATION } = req.query;
-  if (isNaN(parseInt(pageNumber)) || isNaN(parseInt(pageCount))) {
+  const { page = 1, limit = DEFAULT_PAGINATION } = req.query;
+  if (isNaN(parseInt(page)) || isNaN(parseInt(limit))) {
     return res
       .status(400)
       .json({ message: "Invalid Page number and count are required" });
   }
   const pagination = {
-    pageNumber: parseInt(pageNumber),
-    pageCount: parseInt(pageCount),
+    pageNumber: parseInt(page),
+    pageCount: parseInt(limit),
   };
   try {
     const admins = await AdminService.getAdmins(pagination);
@@ -94,8 +96,8 @@ export async function getAdminById(req, res) {
  */
 export async function updateAdmin(req, res) {
   const { id } = req.params;
-  const { username, email, password, phone } = req.body;
-  const userData = { username, email, password, phone };
+  const { username, email, password, phone, isDeleted } = req.body;
+  const userData = { username, email, password, phone, isDeleted };
   try {
     const admin = await AdminService.updateAdmin(id, userData);
     res.status(200).json(admin);

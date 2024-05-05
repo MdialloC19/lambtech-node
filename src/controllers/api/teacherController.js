@@ -1,5 +1,3 @@
-import Teacher from "../../models/Teacher.js";
-import User from "../../models/User.js";
 import TeacherService from "../../services/api/teacher.service.js";
 import { DEFAULT_PAGINATION } from "../../utils/constants.js";
 
@@ -39,25 +37,29 @@ export async function createTeacher(req, res) {
  * @returns {Promise<void>} - A promise that resolves with the list of teachers.
  */
 export async function getTeachers(req, res) {
-  const { pageNumber = 0, pageCount = DEFAULT_PAGINATION } = req.query;
+  const { page = 1, limit = DEFAULT_PAGINATION } = req.query;
 
-  if (isNaN(parseInt(pageNumber)) || isNaN(parseInt(pageCount))) {
+  if (isNaN(parseInt(page)) || isNaN(parseInt(limit))) {
     return res
       .status(400)
       .json({ message: "Invalid Page number and count are required" });
   }
 
   const pagination = {
-    pageNumber: parseInt(pageNumber),
-    pageCount: parseInt(pageCount),
+    pageNumber: parseInt(page),
+    pageCount: parseInt(limit),
   };
 
   try {
     const teachers = TeacherService.getTeachers(pagination);
     res.status(200).json(teachers);
   } catch (error) {
-    console.error("Error fetching teachers:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error(error);
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 }
 /**
@@ -73,7 +75,12 @@ export async function getTeacherById(req, res) {
     const teacher = await TeacherService.getTeacherById(id);
     res.status(200).json(teacher);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    console.error(error);
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 }
 
@@ -96,7 +103,12 @@ export async function updateTeacher(req, res) {
     );
     res.status(200).json(teacher);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    console.error(error);
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 }
 
@@ -109,10 +121,14 @@ export async function updateTeacher(req, res) {
 export async function deleteTeacher(req, res) {
   const { id } = req.params;
   try {
-    const teacher = await TeacherService.deleteTeacher(id);
+    await TeacherService.deleteTeacher(id);
     res.status(200).json({ message: "Teacher deleted successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 }

@@ -21,19 +21,19 @@ export default class TeacherService {
 
     // Basic validation checks
     if (rank && typeof rank !== "string") {
-      throw new HttpError(400, "Rank is required and must be a string.");
+      throw new HttpError(error, 400, "Rank is required and must be a string.");
     }
 
     if (hiringDate && (!(hiringDate instanceof Date) || isNaN(hiringDate))) {
-      throw new HttpError(400, "Invalid hiring date.");
+      throw new HttpError(error, 400, "Invalid hiring date.");
     }
 
     if (hiringDate && new Date(teacherInfos.hiringDate) > new Date()) {
-      throw new HttpError(400, "Hiring date cannot be in the future.");
+      throw new HttpError(error, 400, "Hiring date cannot be in the future.");
     }
 
     if (qualification && !Array.isArray(qualification)) {
-      throw new HttpError(400, "Qualification must be an array.");
+      throw new HttpError(error, 400, "Qualification must be an array.");
     }
 
     if (
@@ -41,24 +41,29 @@ export default class TeacherService {
       experienceYears < 0
     ) {
       throw new HttpError(
+        err,
         400,
         "Experience years must be a non-negative number."
       );
     }
 
     if (salary && (typeof salary !== "number" || salary < 0)) {
-      throw new HttpError(400, "Salary must be a non-negative number.");
+      throw new HttpError(error, 400, "Salary must be a non-negative number.");
     }
 
     if (schedule && (!Array.isArray(schedule) || schedule.length === 0)) {
-      throw new HttpError(400, "Schedule must be a non-empty array.");
+      throw new HttpError(error, 400, "Schedule must be a non-empty array.");
     }
 
     if (schedule)
       for (const slot of schedule) {
         const { dayOfWeek, startTime, endTime } = slot;
         if (!dayOfWeek || !startTime || !endTime) {
-          throw new HttpError(400, "Schedule slot is missing required fields.");
+          throw new HttpError(
+            err,
+            400,
+            "Schedule slot is missing required fields."
+          );
         }
       }
 
@@ -92,13 +97,13 @@ export default class TeacherService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "ValidationError") {
-        throw new HttpError(400, error.message);
-      } else if (error.name === "MongoError" && error.code === 11000) {
-        throw new HttpError(400, "Email already exists.");
+        throw new HttpError(error, 400, error.message);
+      } else if (error.name === "MongoServerError" && error.code === 11000) {
+        throw new HttpError(error, 400, "Email already exists.");
       } else if (error.name === "CastError") {
-        throw new HttpError(400, "Invalid ID.");
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -127,13 +132,13 @@ export default class TeacherService {
       );
 
       if (!teacher) {
-        throw new HttpError(404, "Teacher not found.");
+        throw new HttpError(error, 404, "Teacher not found.");
       }
 
       // update user
       const user = await UserService.updateUser(teacher.user, updatedUserData);
       if (!user) {
-        throw new HttpError(404, "User not found.");
+        throw new HttpError(error, 404, "User not found.");
       }
 
       return teacher;
@@ -141,9 +146,9 @@ export default class TeacherService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "CastError") {
-        throw new HttpError(400, "Invalid ID.");
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -160,13 +165,13 @@ export default class TeacherService {
       const teacher = await Teacher.findOne(teacherId).populate("user");
 
       if (!teacher) {
-        throw new HttpError(404, "Teacher not found.");
+        throw new HttpError(error, 404, "Teacher not found.");
       }
 
       // mark associated user as deleted
       const user = await UserService.deleteUser(teacher.user._id);
       if (!user) {
-        throw new HttpError(404, "User not found.");
+        throw new HttpError(error, 404, "User not found.");
       }
 
       return teacher;
@@ -174,9 +179,9 @@ export default class TeacherService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "CastError") {
-        throw new HttpError(400, "Invalid ID.");
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -196,7 +201,7 @@ export default class TeacherService {
       );
 
       if (!teacher) {
-        throw new HttpError(404, "Teacher not found.");
+        throw new HttpError(error, 404, "Teacher not found.");
       }
 
       return teacher;
@@ -204,9 +209,9 @@ export default class TeacherService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "CastError") {
-        throw new HttpError(400, "Invalid ID.");
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -224,14 +229,14 @@ export default class TeacherService {
       // Fetch all teachers using Mongoose model
       const teachers = await Teacher.find()
         .populate("user", "-password")
-        .skip(pagination.pageNumber * pagination.pageCount)
+        .skip((pagination.pageNumber - 1) * pagination.pageCount)
         .limit(pagination.pageCount);
       if (teachers.length === 0) {
-        throw new HttpError(404, "No teachers found.");
+        throw new HttpError(error, 404, "No teachers found.");
       }
       return teachers;
     } catch (error) {
-      throw new HttpError(500, "Internal server error.");
+      throw new HttpError(error, 500, "Internal server error.");
     }
   }
 }
