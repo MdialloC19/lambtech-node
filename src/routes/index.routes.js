@@ -6,6 +6,9 @@ import teacherRoutes from "./teacher.routes.js";
 import studentRoutes from "./student.routes.js";
 import adminRoutes from "./admin.routes.js";
 import parentRoutes from "./parent.routes.js";
+import formationRoutes from "./formation.routes.js";
+import ueRoutes from "./ue.routes.js";
+import niveauRoutes from "./niveau.routes.js";
 
 const router = express.Router();
 
@@ -16,6 +19,9 @@ router.use("/teacher", teacherRoutes);
 router.use("/student", studentRoutes);
 router.use("/admin", adminRoutes);
 router.use("/parent", parentRoutes);
+router.use("/formation", formationRoutes);
+router.use("/ue", ueRoutes);
+router.use("/niveau", niveauRoutes);
 
 //export default
 export default router;
