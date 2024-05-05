@@ -1,104 +1,100 @@
-import Matiere from "../../models/Matiere.js";
+import MatiereService from "../../services/api/matiere.service.js";
+import { HttpError } from "../../utils/exceptions.js";
 
 /**
- * Crée une nouvelle matière
- * @param {import('express').Request} req - Requête Express
- * @param {import('express').Response} res - Réponse Express
- * @returns {Promise<void>} - Promesse indiquant la fin du traitement
+ * Create a new matiere.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the newly created matiere.
  */
-const createMatiere = async (req, res) => {
+export async function createMatiere(req, res) {
   try {
-    const matiere = await Matiere.create(req.body);
+    const matiere = await MatiereService.createMatiere(req.body);
     res.status(201).json(matiere);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
   }
-};
+}
 
 /**
- * Récupère toutes les matières
- * @param {import('express').Request} req - Requête Express
- * @param {import('express').Response} res - Réponse Express
- * @returns {Promise<void>} - Promesse indiquant la fin du traitement
+ * Get all matieres.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the list of matieres.
  */
-const getAllMatieres = async (req, res) => {
+export async function getAllMatieres(req, res) {
   try {
-    const matieres = await Matiere.find({ isDelete: false });
+    const matieres = await MatiereService.getAllMatieres();
     res.json(matieres);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
   }
-};
+}
 
 /**
- * Récupère une seule matière par son identifiant
- * @param {import('express').Request} req - Requête Express
- * @param {import('express').Response} res - Réponse Express
- * @returns {Promise<void>} - Promesse indiquant la fin du traitement
+ * Get a matiere by its ID.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the matiere.
  */
-const getMatiereById = async (req, res) => {
+export async function getMatiereById(req, res) {
+  const { id } = req.params;
   try {
-    const matiere = await Matiere.findOne({
-      _id: req.params.id,
-      isDelete: false,
-    });
-    if (!matiere) {
-      return res.status(404).json({ error: "Matiere not found" });
-    }
+    const matiere = await MatiereService.getMatiereById(id);
     res.json(matiere);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
   }
-};
+}
 
 /**
- * Met à jour une matière
- * @param {import('express').Request} req - Requête Express
- * @param {import('express').Response} res - Réponse Express
- * @returns {Promise<void>} - Promesse indiquant la fin du traitement
+ * Update a matiere by its ID.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the updated matiere.
  */
-const updateMatiere = async (req, res) => {
+export async function updateMatiere(req, res) {
+  const { id } = req.params;
   try {
-    const matiere = await Matiere.findOneAndUpdate(
-      { _id: req.params.id, isDelete: false },
-      req.body,
-      { new: true }
-    );
-    if (!matiere) {
-      return res.status(404).json({ error: "Matiere not found" });
+    const updatedMatiere = await MatiereService.updateMatiere(id, req.body);
+    res.json(updatedMatiere);
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
     }
-    res.json(matiere);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
   }
-};
+}
 
 /**
- * Supprime une matière en mode soft delete
- * @param {import('express').Request} req - Requête Express
- * @param {import('express').Response} res - Réponse Express
- * @returns {Promise<void>} - Promesse indiquant la fin du traitement
+ * Delete a matiere by its ID.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves with the result of the deletion.
  */
-const deleteMatiere = async (req, res) => {
+export async function deleteMatiere(req, res) {
+  const { id } = req.params;
   try {
-    const matiere = await Matiere.findOneAndUpdate(
-      { _id: req.params.id, isDelete: false },
-      { isDelete: true },
-      { new: true }
-    );
-    if (!matiere) {
-      return res.status(404).json({ error: "Matiere not found" });
-    }
+    await MatiereService.deleteMatiere(id);
     res.sendStatus(204);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
   }
-};
-
-export default {
-  createMatiere,
-  getAllMatieres,
-  getMatiereById,
-  updateMatiere,
-  deleteMatiere,
-};
+}

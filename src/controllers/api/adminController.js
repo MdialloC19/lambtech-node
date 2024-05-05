@@ -15,17 +15,8 @@ import { HttpError } from "../../utils/exceptions.js";
  * @returns {Promise<void>} - A promise that resolves when the admin is created.
  */
 export async function createAdmin(req, res) {
-  const { username, password, email, phone } = req.body;
-
-  const userInfos = {
-    username,
-    email,
-    password,
-    phone,
-  };
-
   try {
-    await AdminService.createAdmin(userInfos);
+    await AdminService.createAdmin(req.body);
     res.status(201).json({ message: "Admin created successfully" });
   } catch (error) {
     console.error(error);
@@ -95,11 +86,9 @@ export async function getAdminById(req, res) {
  * @returns {Promise<void>} - A promise that resolves when the admin is updated.
  */
 export async function updateAdmin(req, res) {
-  const { id } = req.params;
-  const { username, email, password, phone, isDeleted } = req.body;
-  const userData = { username, email, password, phone, isDeleted };
+  if (req.body.isDeleted) req.body.isDeleted = undefined;
   try {
-    const admin = await AdminService.updateAdmin(id, userData);
+    const admin = await AdminService.updateAdmin(id, req.body);
     res.status(200).json(admin);
   } catch (error) {
     console.error(error);
