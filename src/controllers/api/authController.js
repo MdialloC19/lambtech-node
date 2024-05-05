@@ -1,6 +1,8 @@
 import { validationResult } from "express-validator";
 import User from "../../models/User.js";
 import bcrypt from "bcryptjs";
+import Teacher from "../../models/Teacher.js";
+import { createTeacherUser } from "./teacherController.js";
 // const config = require("config");
 import jwt from "jsonwebtoken";
 
@@ -10,7 +12,7 @@ const authRegisterUser = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { username, email, phone, password, role } = req.body;
+  const { username, email, phone, password, role, salary } = req.body;
 
   try {
     let user = await User.findOne({ email });
@@ -26,6 +28,7 @@ const authRegisterUser = async (req, res) => {
       email,
       phone,
       password,
+      role,
     });
 
     // Encrypt password
@@ -37,7 +40,31 @@ const authRegisterUser = async (req, res) => {
     await user.save();
 
     // Return jsonwebtoken
-
+    console.log(user.role);
+    // if (user.role == "TEACHER") {
+    try {
+      const teacherInfos = {
+        username,
+        email,
+        phone,
+        user: user._id,
+        salary,
+      };
+      const teacher = await Teacher.create({
+        ...teacherInfos,
+      });
+      console.log("ok");
+    } catch (error) {
+      console.error(error);
+      // Handle errors during document creation
+      let errorMessage = "Failed to create teacher.";
+      if (error.name === "ValidationError") {
+        errorMessage = error.message; // Mongoose validation error
+      } else if (error.code === 11000) {
+        errorMessage = "Duplicate key error. Please check unique fields.";
+      }
+    }
+    // }
     const payload = {
       user: {
         id: user.id,
