@@ -10,9 +10,24 @@ const UniteEnseignementSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Please give the credit UE"],
   },
+  matieres: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "matiere",
+      },
+    ],
+  },
+  moyenneUE: {
+    type: Number,
+  },
   intitule: {
     type: String,
     required: [true, "Please give the intitule UE"],
+  },
+  nbAbsence: {
+    type: Number,
+    default: 0,
   },
   niveau: {
     type: mongoose.Schema.Types.ObjectId,
