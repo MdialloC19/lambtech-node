@@ -4,3 +4,4 @@
 - helmet JS (protection API)
 - Generer email sur user schema
 - ajouter firstName et lastNAme
+- logging avec morgan
