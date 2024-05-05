@@ -14,6 +14,11 @@ const UniteEnseignementSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please give the intitule UE"],
   },
+  niveau: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "niveau",
+    required: true,
+  },
   isDeleted: {
     type: Boolean,
     default: false,

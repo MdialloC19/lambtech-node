@@ -1,6 +1,7 @@
 import Student from "../../models/Student.js";
 import User from "../../models/User.js";
 import integretyTester from "../../utils/integrety.utils.js";
+import APIFeatures from "../../utils/apiFeatures.js";
 
 /**
  * @route   GET
@@ -9,7 +10,14 @@ import integretyTester from "../../utils/integrety.utils.js";
  */
 const getStudents = async (req, res) => {
   try {
-    const students = await Student.find();
+    const features = new APIFeatures(Student.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    // Execute query
+    const students = await features.query;
+    // const students = await Student.find();
     res.json(students);
   } catch (err) {
     console.error(err.message);

@@ -1,4 +1,5 @@
 import Niveau from "../../models/Niveau.js";
+import APIFeatures from "../../utils/apiFeatures.js";
 
 /**
  * @route   GET api/niveaux
@@ -7,7 +8,12 @@ import Niveau from "../../models/Niveau.js";
  */
 const getNiveaux = async (req, res) => {
   try {
-    const niveaux = await Niveau.find();
+    const features = new APIFeatures(Niveau.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const niveaux = await features.query;
     res.json(niveaux);
   } catch (err) {
     console.error(err.message);
