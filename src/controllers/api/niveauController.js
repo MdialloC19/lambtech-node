@@ -1,15 +1,10 @@
 import NiveauService from "../../services/api/niveau.service.js";
-
-// JSDoc typedefs
-/**
- * @typedef {import('express').Request} ExpressRequest
- * @typedef {import('express').Response} ExpressResponse
- */
+import { HttpError } from "../../utils/exceptions.js";
 
 /**
  * Get all niveaux.
- * @param {ExpressRequest} req - The request object.
- * @param {ExpressResponse} res - The response object.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
  * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
 export async function getNiveaux(req, res) {
@@ -17,14 +12,18 @@ export async function getNiveaux(req, res) {
     const niveaux = await NiveauService.getAllNiveaux(req.query);
     res.json(niveaux);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
 
 /**
  * Create a new niveau.
- * @param {ExpressRequest} req - The request object.
- * @param {ExpressResponse} res - The response object.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
  * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
 export async function createNiveau(req, res) {
@@ -32,14 +31,18 @@ export async function createNiveau(req, res) {
     const newNiveau = await NiveauService.createNiveau(req.body);
     res.status(201).json(newNiveau);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
 
 /**
  * Get a niveau by ID.
- * @param {ExpressRequest} req - The request object.
- * @param {ExpressResponse} res - The response object.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
  * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
 export async function getNiveauById(req, res) {
@@ -48,14 +51,18 @@ export async function getNiveauById(req, res) {
     const niveau = await NiveauService.getNiveauById(id);
     res.json(niveau);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
 
 /**
  * Update a niveau by ID.
- * @param {ExpressRequest} req - The request object.
- * @param {ExpressResponse} res - The response object.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
  * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
 export async function updateNiveau(req, res) {
@@ -64,14 +71,18 @@ export async function updateNiveau(req, res) {
     const updatedNiveau = await NiveauService.updateNiveau(id, req.body);
     res.json(updatedNiveau);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
 
 /**
  * Delete a niveau by ID.
- * @param {ExpressRequest} req - The request object.
- * @param {ExpressResponse} res - The response object.
+ * @param {import('express').Request} req - The request object.
+ * @param {import('express').Response} res - The response object.
  * @returns {Promise<void>} - A promise that resolves when the operation is complete.
  */
 export async function deleteNiveau(req, res) {
@@ -80,6 +91,10 @@ export async function deleteNiveau(req, res) {
     const result = await NiveauService.deleteNiveau(id);
     res.json(result);
   } catch (error) {
-    res.status(error.statusCode || 500).json({ message: error.message });
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
