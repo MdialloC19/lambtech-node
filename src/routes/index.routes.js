@@ -13,6 +13,9 @@ import matiereRoutes from "./matiere.routes.js";
 import smsRoutes from "./sms.routes.js";
 import evaluationRoutes from "./evaluation.routes.js";
 import pointageRoutes from "./pointage.routes.js";
+import evaluationRoutes from "./evaluation.routes.js";
+import presenceStudentRoutes from "./presenceStudent.routes.js";
+import presenceTeacherRoutes from "./presenceTeacher.routes.js";
 
 const router = express.Router();
 
@@ -30,6 +33,8 @@ router.use("/matiere", matiereRoutes);
 router.use("/evaluation", evaluationRoutes);
 router.use("/pointage", pointageRoutes);
 router.use("/sms", smsRoutes);
+router.use("/presenceStudent", presenceStudentRoutes);
+router.use("/presenceTeacher", presenceTeacherRoutes);
 
 //export default
 export default router;
