@@ -24,13 +24,13 @@ export default class AdminService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "ValidationError") {
-        throw new HttpError(400, error.message);
-      } else if (error.name === "MongoError" && error.code === 11000) {
-        throw new HttpError(400, "Email already exists.");
+        throw new HttpError(error, 400, error.message);
+      } else if (error.name === "MongoServerError" && error.code === 11000) {
+        throw new HttpError(error, 400, "Email already exists.");
       } else if (error.name === "CastError") {
-        throw new HttpError(400, "Invalid ID.");
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -45,10 +45,16 @@ export default class AdminService {
   static async updateAdmin(adminId, updatedUserData) {
     try {
       // Update admin using Mongoose model
-      const user = UserService.updateUser(adminId, updatedUserData);
+      const admin = await Admin.findById(adminId);
+      if (!admin) {
+        console.log("throw");
+        throw new HttpError(null, 404, "Admin not found.");
+      }
+
+      const user = UserService.updateUser(admin.user, updatedUserData);
 
       if (!user) {
-        throw new HttpError(404, "user not found.");
+        throw new HttpError(null, 404, "user not found.");
       }
 
       return user;
@@ -56,9 +62,9 @@ export default class AdminService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "CastError") {
-        throw new HttpError(400, "Invalid ID.");
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -72,22 +78,21 @@ export default class AdminService {
   static async deleteAdmin(adminId) {
     try {
       // Find and delete admin using Mongoose model
-      const admin = await Admin.findOne(adminId).populate("user");
+      const admin = await Admin.findById(adminId);
 
       if (!admin) {
-        throw new HttpError(404, "Admin not found.");
+        throw new HttpError(null, 404, "Admin not found.");
       }
-
-      await UserService.deleteUser(admin.user._id);
+      await UserService.deleteUser(admin.user);
 
       return admin;
     } catch (error) {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "CastError") {
-        throw new HttpError(400, "Invalid ID.");
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -104,7 +109,7 @@ export default class AdminService {
       const admin = await Admin.findById(adminId).populate("user", "-password");
 
       if (!admin) {
-        throw new HttpError(404, "Admin not found.");
+        throw new HttpError(null, 404, "Admin not found.");
       }
 
       return admin;
@@ -112,9 +117,9 @@ export default class AdminService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else if (error.name === "CastError") {
-        throw new HttpError(400, "Invalid ID.");
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -135,11 +140,11 @@ export default class AdminService {
           path: "user",
           select: "-password",
         })
-        .skip(pagination.pageNumber * pagination.pageCount)
+        .skip((pagination.pageNumber - 1) * pagination.pageCount)
         .limit(pagination.pageCount);
 
       if (admins.length === 0) {
-        throw new HttpError(404, "No admins found.");
+        throw new HttpError(error, 404, "No admins found.");
       }
 
       return admins;
@@ -147,7 +152,7 @@ export default class AdminService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }

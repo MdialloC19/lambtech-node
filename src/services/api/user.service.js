@@ -1,6 +1,8 @@
+import Admin from "../../models/Admin.js";
 import User from "../../models/User.js";
 import { HttpError } from "../../utils/exceptions.js";
 import integretyTester from "../../utils/integrety.utils.js";
+import AdminService from "./admin.service.js";
 
 export default class UserService {
   /**
@@ -14,15 +16,20 @@ export default class UserService {
 
     // Basic validation checks
     if (!username || typeof username !== "string") {
-      throw new HttpError(400, "Username is required and must be a string.");
+      throw new HttpError(
+        null,
+        400,
+        "Username is required and must be a string."
+      );
     }
 
     if (!integretyTester.isEmail(email)) {
-      throw new HttpError(400, "Invalid email format.");
+      throw new HttpError(null, 400, "Invalid email format.");
     }
 
     if (!password || typeof password !== "string" || password.length < 6) {
       throw new HttpError(
+        null,
         400,
         "Password is required and must be at least 6 characters long."
       );
@@ -49,8 +56,14 @@ export default class UserService {
     } catch (error) {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
+      } else if (error.name === "ValidationError") {
+        throw new HttpError(error, 400, error.message);
+      } else if (error.name === "MongoServerError" && error.code === 11000) {
+        throw new HttpError(error, 400, "Email already exists.");
+      } else if (error.name === "CastError") {
+        throw new HttpError(error, 400, "Invalid ID.");
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -73,7 +86,7 @@ export default class UserService {
       });
 
       if (!user) {
-        throw new HttpError(404, "User not found.");
+        throw new HttpError(null, 404, "User not found.");
       }
 
       return user;
@@ -81,7 +94,7 @@ export default class UserService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -95,10 +108,12 @@ export default class UserService {
   static async deleteUser(userId) {
     try {
       // Find and delete user using Mongoose model
-      const user = await User.findOneAndUpdate(userId, { isDeleted: true });
+      const user = await User.findByIdAndUpdate(userId, {
+        isDeleted: true,
+      });
 
       if (!user) {
-        throw new HttpError(404, "User not found.");
+        throw new HttpError(null, 404, "User not found.");
       }
 
       return user;
@@ -106,7 +121,7 @@ export default class UserService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -123,7 +138,7 @@ export default class UserService {
       const user = await User.findById(userId);
 
       if (!user) {
-        throw new HttpError(404, "User not found.");
+        throw new HttpError(error, 404, "User not found.");
       }
 
       return user;
@@ -131,7 +146,7 @@ export default class UserService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
@@ -144,10 +159,10 @@ export default class UserService {
   static async getAllUsers() {
     try {
       // Find all users using Mongoose model
-      const users = await User.find({ isDeleted: false });
+      const users = await User.find();
 
       if (users.length === 0) {
-        throw new HttpError(404, "No users found.");
+        throw new HttpError(error, 404, "No users found.");
       }
 
       return users;
@@ -155,7 +170,7 @@ export default class UserService {
       if (error instanceof HttpError) {
         throw error; // Rethrow the custom HttpError
       } else {
-        throw new HttpError(500, "Internal server error."); // Default to 500 for unexpected errors
+        throw new HttpError(error, 500, "Internal server error."); // Default to 500 for unexpected errors
       }
     }
   }
