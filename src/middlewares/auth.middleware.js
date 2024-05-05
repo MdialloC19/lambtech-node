@@ -3,9 +3,9 @@ import validator from "../utils/integrety.utils.js";
 const validateRegister = (req, res, next) => {
   const { email, phone, username, password, role } = req.body;
 
-  if ((!email && !phone) || !password || !username || !role) {
+  if ((!email && !phone) || !password || !role) {
     return res.status(400).json({
-      message: "Please provide email, phone, username,role and password",
+      message: "Please provide email, phone, ,role and password",
       data: null,
     });
   }
@@ -24,14 +24,14 @@ const validateRegister = (req, res, next) => {
     invalid.push("invalid phone");
   }
 
-  // Check if username length is less than 3
-  if (username.length < 3) {
-    invalid.push("username must be at least 3 characters long");
-  }
+  // Check if  length is less than 3
+  // if (username.length < 3) {
+  //   invalid.push("username must be at least 3 characters long");
+  // }
 
   // No injection check
   if (
-    validator.hasInjection(username) ||
+    // validator.hasInjection(username) ||
     validator.hasInjection(password) ||
     validator.hasInjection(email) ||
     validator.hasInjection(phone)
