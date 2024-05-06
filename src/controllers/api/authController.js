@@ -1,7 +1,5 @@
-import { validationResult } from "express-validator";
-import User from "../../models/User.js";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import AuthService from "../../services/auth/auth.service.js";
+import { HttpError } from "../../utils/exceptions.js";
 
 /**
  * Enregistre un nouvel utilisateur
@@ -9,86 +7,19 @@ import jwt from "jsonwebtoken";
  * @param {import('express').Response} res - Réponse Express
  * @returns {Promise<void>} - Promesse indiquant la fin du traitement
  */
+
 const authRegisterUser = async (req, res) => {
-  // Validation des données de la requête
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const {
-    firstname,
-    lastname,
-    dateofbirth,
-    placeofbirth,
-    nationality,
-    address,
-    sexe,
-    email,
-    phone,
-    password,
-    role,
-  } = req.body;
-
   try {
-    // Vérifie si l'utilisateur existe déjà
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ errors: [{ msg: "User already exists" }] });
-    }
+    const registerUser = await AuthService.registerUser(req.body);
 
-    // Crée un nouvel utilisateur
-    user = new User({
-      firstname,
-      lastname,
-      dateofbirth,
-      placeofbirth,
-      nationality,
-      address,
-      sexe,
-      email,
-      phone,
-      password,
-      role,
-    });
-
-    // Hash du mot de passe
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-
-    // Enregistre l'utilisateur dans la base de données
-    await user.save();
-
-    // Crée un token JWT
-    const payload = {
-      user: {
-        id: user.id,
-        firstname: user.firstname,
-        lastname: user.lastname,
-        role: user.role,
-      },
-    };
-
-    // Signe le token
-    jwt.sign(
-      payload,
-      process.env.jwtSecret,
-      { expiresIn: "5 days" },
-      (err, token) => {
-        if (err) throw err;
-        return res.status(201).json({
-          token,
-          success: true,
-          message: "User registered",
-        });
-      }
-    );
+    return res.status(201).json(registerUser);
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({
-      success: false,
-      error: [error.message],
-    });
+    console.error(error);
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 };
 
@@ -100,58 +31,15 @@ const authRegisterUser = async (req, res) => {
  */
 const authLoginUser = async (req, res) => {
   try {
-    // Validation des champs
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { email, password } = req.body;
-
-    // Vérification si l'utilisateur existe
-    let user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({
-        errors: [{ msg: "Invalid Credentials" }],
-      });
-    }
-
-    // Vérification du mot de passe
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({
-        errors: [{ msg: "Invalid Credentials" }],
-      });
-    }
-
-    // Création du token JWT
-    const payload = {
-      user: {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-      },
-    };
-
-    jwt.sign(
-      payload,
-      process.env.jwtSecret,
-      { expiresIn: "5 days" },
-      (err, token) => {
-        if (err) throw err;
-        res.status(201).json({
-          token,
-          success: true,
-          message: "Authenticated",
-        });
-      }
-    );
+    const loginUser = await AuthService.loginUser(req.body);
+    return res.status(200).json(loginUser);
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({
-      success: false,
-      error: "Server Error",
-    });
+    console.error(error);
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 };
 
